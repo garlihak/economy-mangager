@@ -1062,13 +1062,9 @@ function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" !=
 function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
 /* eslint-disable */
 // ═══════════════════════════════════════════════════════════════
-//  우리 마을 경제 매니저  v3  —  Firebase 실시간 연동
-//  학생 태블릿 입력 → Firebase → 교사 전자칠판 자동 갱신
+//   우리 마을 경제 매니저  v3  —  Firebase 실시간 연동
+//   학생 태블릿 입력 → Firebase → 교사 전자칠판 자동 갱신
 // ═══════════════════════════════════════════════════════════════
-
-// ── Firebase SDK (CDN에서 로드, index.html에 script 태그 필요) ──
-// import는 모듈 방식 대신 window.firebase 전역 객체 사용
-// → 아래 initFirebase()에서 처리
 
 var _React = React,
   useState = _React.useState,
@@ -1077,7 +1073,7 @@ var _React = React,
   useCallback = _React.useCallback;
 
 // ─────────────────────────────────────────────────────────────
-//  🔥 Firebase 설정 — 선생님 config로 교체하세요
+//  🔥 Firebase 설정
 // ─────────────────────────────────────────────────────────────
 var FIREBASE_CONFIG = {
   apiKey: "AIzaSyBRi8c6XhwWqyeZFN7EyFVB5WDn3PG2tPM",
@@ -1089,126 +1085,34 @@ var FIREBASE_CONFIG = {
   appId: "1:990780268455:web:4bee541f1548ca8e29a082",
   measurementId: "G-0TBMN1CV9T"
 };
-
-// DB 경로
 var DB_PATH = 'village_economy_v1';
 
 // ─────────────────────────────────────────────────────────────
 //  게임 데이터 상수
 // ─────────────────────────────────────────────────────────────
 var FACILITIES = {
-  farm: {
-    icon: '🌾',
-    name: '논',
-    cost: 3,
-    prod: {
-      rice: 3
-    },
-    happy: 0
-  },
-  factory: {
-    icon: '🏭',
-    name: '공장',
-    cost: 5,
-    prod: {
-      product: 2
-    },
-    happy: 0
-  },
-  power: {
-    icon: '⚡',
-    name: '발전소',
-    cost: 6,
-    prod: {
-      electricity: 4
-    },
-    happy: 0
-  },
-  hospital: {
-    icon: '🏥',
-    name: '병원',
-    cost: 5,
-    prod: {
-      medical: 2
-    },
-    happy: 5
-  },
-  school: {
-    icon: '🏫',
-    name: '학교',
-    cost: 4,
-    prod: {},
-    happy: 3
-  },
-  tourist: {
-    icon: '🎭',
-    name: '관광지',
-    cost: 4,
-    prod: {
-      culture: 2
-    },
-    happy: 5
-  },
-  market: {
-    icon: '🛒',
-    name: '시장',
-    cost: 3,
-    prod: {},
-    happy: 2
-  }
+  farm: { icon: '🌾', name: '논', cost: 3, prod: { rice: 3 }, happy: 0 },
+  factory: { icon: '🏭', name: '공장', cost: 5, prod: { product: 2 }, happy: 0 },
+  power: { icon: '⚡', name: '발전소', cost: 6, prod: { electricity: 4 }, happy: 0 },
+  hospital: { icon: '🏥', name: '병원', cost: 5, prod: { medical: 2 }, happy: 5 },
+  school: { icon: '🏫', name: '학교', cost: 4, prod: {}, happy: 3 },
+  tourist: { icon: '🎭', name: '관광지', cost: 4, prod: { culture: 2 }, happy: 5 },
+  market: { icon: '🛒', name: '시장', cost: 3, prod: {}, happy: 2 }
 };
 var RESOURCES = {
-  rice: {
-    icon: '🌾',
-    name: '쌀',
-    desc: '매 라운드 2소비'
-  },
-  electricity: {
-    icon: '⚡',
-    name: '전기',
-    desc: '공장 가동에 필수'
-  },
-  medical: {
-    icon: '🏥',
-    name: '의료',
-    desc: '행복 회복(+5)'
-  },
-  culture: {
-    icon: '🎭',
-    name: '문화',
-    desc: '행복 상승(+3)'
-  },
-  product: {
-    icon: '🏭',
-    name: '제품',
-    desc: '수출시 코인(+2)'
-  }
+  rice: { icon: '🌾', name: '쌀', desc: '매 라운드 2소비' },
+  electricity: { icon: '⚡', name: '전기', desc: '공장 가동에 필수' },
+  medical: { icon: '🏥', name: '의료', desc: '행복 회복(+5)' },
+  culture: { icon: '🎭', name: '문화', desc: '행복 상승(+3)' },
+  product: { icon: '🏭', name: '제품', desc: '수출시 코인(+2)' }
 };
 var ROUND_EVENTS = {
-  '3': {
-    name: '🌧️ 가뭄 발생',
-    desc: '이번 라운드 쌀 생산량이 30% 감소합니다. 쌀이 부족해지지 않도록 주의하세요!'
-  },
-  '4': {
-    name: '🦠 전염병 경보',
-    desc: '마을의 기본 행복지수가 -10 감소합니다. 병원이 있으면 -5로 경감! 의료 자원으로 치료하세요!'
-  },
-  '5': {
-    name: '🤝 기술 교류 제안',
-    desc: '학교가 있는 마을은 행복 +5 보너스! 이번 라운드 교류를 1회 무료로 할 수 있어요.'
-  },
-  '6': {
-    name: '🎭 문화 축제 개최',
-    desc: '관광지가 있는 마을은 행복 +5, 코인 +3 보너스!'
-  },
-  '7': {
-    name: '🏅 품질 인증 획득',
-    desc: '논이 2개 이상인 마을은 코인 +5 보너스! 농업 마을의 역습!'
-  },
-  '8': {
-    name: '🌊 홍수 피해',
-    desc: '정산 시 쌀이 2개 추가로 유실됩니다. 쌀이 충분한 마을과 교류하면 위기를 넘길 수 있어요!'
-  }
+  '3': { name: '🌧️ 가뭄 발생', desc: '이번 라운드 쌀 생산량이 30% 감소합니다. 쌀이 부족해지지 않도록 주의하세요!' },
+  '4': { name: '🦠 전염병 경보', desc: '마을의 기본 행복지수가 -10 감소합니다. 병원이 있으면 -5로 경감! 의료 자원으로 치료하세요!' },
+  '5': { name: '🤝 기술 교류 제안', desc: '학교가 있는 마을은 행복 +5 보너스! 이번 라운드 교류를 1회 무료로 할 수 있어요.' },
+  '6': { name: '🎭 문화 축제 개최', desc: '관광지가 있는 마을은 행복 +5, 코인 +3 보너스!' },
+  '7': { name: '🏅 품질 인증 획득', desc: '논이 2개 이상인 마을은 코인 +5 보너스! 농업 마을의 역습!' },
+  '8': { name: '🌊 홍수 피해', desc: '정산 시 쌀이 2개 추가로 유실됩니다. 쌀이 충분한 마을과 교류하면 위기를 넘길 수 있어요!' }
 };
 var ROUND_QUESTIONS = {
   '1': '15코인이 주어진다면 어떤 기준으로 건물을 고를 거야? 왜 그 기준이 중요할까?',
@@ -1221,96 +1125,31 @@ var ROUND_QUESTIONS = {
   '8': '교류가 없었다면 우리 마을은 지금 어떻게 됐을까? 데이터로 설명해봐.'
 };
 var ROUND_LABELS = {
-  '1': 'R1 · 5차시',
-  2: 'R2 · 6차시',
-  3: 'R3 · 7차시',
-  '4': 'R4 · 8~9차시',
-  5: 'R5 · 9~10차시',
-  6: 'R6 · 10~11차시',
-  '7': 'R7 · 11~12차시',
-  8: 'R8 · 12~13차시 · 최종'
+  '1': 'R1 · 5차시', 2: 'R2 · 6차시', 3: 'R3 · 7차시', '4': 'R4 · 8~9차시',
+  5: 'R5 · 9~10차시', 6: 'R6 · 10~11차시', '7': 'R7 · 11~12차시', 8: 'R8 · 12~13차시 · 최종'
 };
 var VILLAGE_THEME = {
-  '1': {
-    cls: 'vc-1',
-    roof: '🏡',
-    tag: '햇살 마을'
-  },
-  '2': {
-    cls: 'vc-2',
-    roof: '🌳',
-    tag: '숲속 마을'
-  },
-  '3': {
-    cls: 'vc-3',
-    roof: '🏘️',
-    tag: '바다 마을'
-  },
-  '4': {
-    cls: 'vc-4',
-    roof: '🏰',
-    tag: '꽃잎 마을'
-  }
+  '1': { cls: 'vc-1', roof: '🏡', tag: '햇살 마을' },
+  '2': { cls: 'vc-2', roof: '🌳', tag: '숲속 마을' },
+  '3': { cls: 'vc-3', roof: '🏘️', tag: '바다 마을' },
+  '4': { cls: 'vc-4', roof: '🏰', tag: '꽃잎 마을' }
 };
-var EMPTY_BOUGHT = function EMPTY_BOUGHT() {
-  return Object.fromEntries(Object.keys(FACILITIES).map(function (k) {
-    return [k, 0];
-  }));
-};
-var EMPTY_TRADE = function EMPTY_TRADE() {
-  return {
-    rice: 0,
-    electricity: 0,
-    medical: 0,
-    product: 0,
-    culture: 0,
-    coins: 0
-  };
-};
-var EMPTY_ROUND_INPUT = function EMPTY_ROUND_INPUT() {
-  return {
-    bought: EMPTY_BOUGHT(),
-    tradeIn: EMPTY_TRADE(),
-    tradeOut: EMPTY_TRADE()
-  };
-};
+var EMPTY_BOUGHT = function EMPTY_BOUGHT() { return Object.fromEntries(Object.keys(FACILITIES).map(function (k) { return [k, 0]; })); };
+var EMPTY_TRADE = function EMPTY_TRADE() { return { rice: 0, electricity: 0, medical: 0, product: 0, culture: 0, coins: 0 }; };
+var EMPTY_ROUND_INPUT = function EMPTY_ROUND_INPUT() { return { bought: EMPTY_BOUGHT(), tradeIn: EMPTY_TRADE(), tradeOut: EMPTY_TRADE() }; };
 var INIT_GROUP = function INIT_GROUP(n) {
   return {
-    name: "".concat(n, "\uBAA8\uB460 \uB9C8\uC744"),
-    coins: 25,
-    happyBase: 50,
-    resources: {
-      rice: 0,
-      electricity: 0,
-      medical: 0,
-      product: 0,
-      culture: 0
-    },
-    facilities: {
-      farm: 0,
-      factory: 0,
-      power: 0,
-      hospital: 0,
-      school: 0,
-      tourist: 0,
-      market: 0
-    },
-    lastSubmittedRound: 0,
-    tradeCount: 0
+    name: "".concat(n, "\uBAA8\uB460 \uB9C8\uC744"), coins: 25, happyBase: 50,
+    resources: { rice: 0, electricity: 0, medical: 0, product: 0, culture: 0 },
+    facilities: { farm: 0, factory: 0, power: 0, hospital: 0, school: 0, tourist: 0, market: 0 },
+    lastSubmittedRound: 0, tradeCount: 0
   };
 };
-var INIT_APP = function INIT_APP() {
-  return {
-    round: 1,
-    groups: {}
-  };
-};
+var INIT_APP = function INIT_APP() { return { round: 1, groups: {} }; };
 function calcHappiness(happyBase, facilities) {
   if (!facilities) return happyBase !== null && happyBase !== void 0 ? happyBase : 50;
   var facHappy = Object.entries(facilities).reduce(function (sum, _ref) {
-    var _ref2 = _slicedToArray(_ref, 2),
-      id = _ref2[0],
-      cnt = _ref2[1];
+    var _ref2 = _slicedToArray(_ref, 2), id = _ref2[0], cnt = _ref2[1];
     if (!FACILITIES[id]) return sum;
     return sum + FACILITIES[id].happy * cnt;
   }, 0);
@@ -1321,26 +1160,15 @@ function calcHappiness(happyBase, facilities) {
 //  Firebase 초기화 훅
 // ─────────────────────────────────────────────────────────────
 function useFirebase() {
-  var _useState = useState(null),
-    _useState2 = _slicedToArray(_useState, 2),
-    db = _useState2[0],
-    setDb = _useState2[1];
-  var _useState3 = useState(false),
-    _useState4 = _slicedToArray(_useState3, 2),
-    fbReady = _useState4[0],
-    setFbReady = _useState4[1];
-  var _useState5 = useState(null),
-    _useState6 = _slicedToArray(_useState5, 2),
-    fbError = _useState6[0],
-    setFbError = _useState6[1];
+  var _useState = useState(null), _useState2 = _slicedToArray(_useState, 2), db = _useState2[0], setDb = _useState2[1];
+  var _useState3 = useState(false), _useState4 = _slicedToArray(_useState3, 2), fbReady = _useState4[0], setFbReady = _useState4[1];
+  var _useState5 = useState(null), _useState6 = _slicedToArray(_useState5, 2), fbError = _useState6[0], setFbError = _useState6[1];
   useEffect(function () {
-    // Firebase SDK가 CDN으로 로드됐는지 확인
     if (typeof firebase === 'undefined') {
       setFbError('Firebase SDK가 로드되지 않았습니다. index.html을 확인하세요.');
       return;
     }
     try {
-      // 이미 초기화됐으면 재사용
       var app;
       if (firebase.apps && firebase.apps.length > 0) {
         app = firebase.apps[0];
@@ -1354,420 +1182,127 @@ function useFirebase() {
       setFbError('Firebase 연결 실패: ' + e.message);
     }
   }, []);
-  return {
-    db: db,
-    fbReady: fbReady,
-    fbError: fbError
-  };
+  return { db: db, fbReady: fbReady, fbError: fbError };
 }
 
 // ─────────────────────────────────────────────────────────────
 //  실시간 DB 읽기/쓰기 훅
 // ─────────────────────────────────────────────────────────────
 function useGameState(db, fbReady) {
-  var _useState7 = useState(INIT_APP()),
-    _useState8 = _slicedToArray(_useState7, 2),
-    gameState = _useState8[0],
-    setGameState = _useState8[1];
-  var _useState9 = useState(false),
-    _useState0 = _slicedToArray(_useState9, 2),
-    synced = _useState0[0],
-    setSynced = _useState0[1];
+  var _useState7 = useState(INIT_APP()), _useState8 = _slicedToArray(_useState7, 2), gameState = _useState8[0], setGameState = _useState8[1];
+  var _useState9 = useState(false), _useState0 = _slicedToArray(_useState9, 2), synced = _useState0[0], setSynced = _useState0[1];
   useEffect(function () {
     if (!db || !fbReady) return;
     var ref = db.ref(DB_PATH);
     var onValue = ref.on('value', function (snapshot) {
       var data = snapshot.val();
       if (data) {
-        // groups가 없거나 null이면 빈 객체로 보장
         if (!data.groups) data.groups = {};
         if (typeof data.round !== 'number') data.round = 1;
         setGameState(data);
       } else {
-        // 데이터 없으면 초기값 쓰기
         ref.set(INIT_APP());
       }
       setSynced(true);
     }, function (err) {
       console.error('Firebase 읽기 오류:', err);
     });
-    return function () {
-      return ref.off('value', onValue);
-    };
+    return function () { return ref.off('value', onValue); };
   }, [db, fbReady]);
   var saveState = useCallback(function (newState) {
-    setGameState(newState); // 낙관적 업데이트
+    setGameState(newState);
     if (db && fbReady) {
-      db.ref(DB_PATH).set(newState).catch(function (err) {
-        console.error('Firebase 쓰기 오류:', err);
-      });
+      db.ref(DB_PATH).set(newState).catch(function (err) { console.error('Firebase 쓰기 오류:', err); });
     }
   }, [db, fbReady]);
   var resetState = useCallback(function () {
     var fresh = INIT_APP();
     setGameState(fresh);
-    if (db && fbReady) {
-      db.ref(DB_PATH).set(fresh);
-    }
+    if (db && fbReady) { db.ref(DB_PATH).set(fresh); }
   }, [db, fbReady]);
-  return {
-    gameState: gameState,
-    saveState: saveState,
-    resetState: resetState,
-    synced: synced
-  };
+  return { gameState: gameState, saveState: saveState, resetState: resetState, synced: synced };
 }
 
 // ─────────────────────────────────────────────────────────────
 //  ROOT
 // ─────────────────────────────────────────────────────────────
 function App() {
-  var _useFirebase = useFirebase(),
-    db = _useFirebase.db,
-    fbReady = _useFirebase.fbReady,
-    fbError = _useFirebase.fbError;
-  var _useGameState = useGameState(db, fbReady),
-    gameState = _useGameState.gameState,
-    saveState = _useGameState.saveState,
-    resetState = _useGameState.resetState,
-    synced = _useGameState.synced;
-  var _useState1 = useState('start'),
-    _useState10 = _slicedToArray(_useState1, 2),
-    mode = _useState10[0],
-    setMode = _useState10[1]; // 'start' | 'student' | 'teacher'
-  var _useState11 = useState(null),
-    _useState12 = _slicedToArray(_useState11, 2),
-    activeGroup = _useState12[0],
-    setActiveGroup = _useState12[1];
+  var _useFirebase = useFirebase(), db = _useFirebase.db, fbReady = _useFirebase.fbReady, fbError = _useFirebase.fbError;
+  var _useGameState = useGameState(db, fbReady), gameState = _useGameState.gameState, saveState = _useGameState.saveState, resetState = _useGameState.resetState, synced = _useGameState.synced;
+  var _useState1 = useState('start'), _useState10 = _slicedToArray(_useState1, 2), mode = _useState10[0], setMode = _useState10[1];
+  var _useState11 = useState(null), _useState12 = _slicedToArray(_useState11, 2), activeGroup = _useState12[0], setActiveGroup = _useState12[1];
 
-  // Firebase 오류 화면
   if (fbError) {
-    return /*#__PURE__*/React.createElement("div", {
-      style: {
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: '#FFF8E7',
-        padding: 24
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        maxWidth: 480,
-        textAlign: 'center',
-        background: 'white',
-        borderRadius: 24,
-        padding: 36,
-        border: '3px solid #F2C98A',
-        boxShadow: '0 8px 0 #F2C98A'
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 64,
-        marginBottom: 12
-      }
-    }, "\uD83D\uDD25"), /*#__PURE__*/React.createElement("h2", {
-      style: {
-        fontFamily: 'Jua',
-        color: '#B83C30',
-        margin: '0 0 12px'
-      }
-    }, "Firebase \uC5F0\uACB0 \uC624\uB958"), /*#__PURE__*/React.createElement("p", {
-      style: {
-        fontFamily: 'Gaegu',
-        fontSize: 18,
-        color: '#5A3A22',
-        lineHeight: 1.6,
-        margin: '0 0 24px'
-      }
-    }, fbError), /*#__PURE__*/React.createElement("div", {
-      style: {
-        background: '#FFF3D6',
-        borderRadius: 14,
-        padding: 16,
-        textAlign: 'left',
-        fontFamily: 'Gaegu',
-        fontSize: 15,
-        color: '#8A6B4F'
-      }
-    }, /*#__PURE__*/React.createElement("b", null, "\uD574\uACB0 \uBC29\uBC95:"), /*#__PURE__*/React.createElement("br", null), "1. index.html\uC5D0 Firebase SDK script \uD0DC\uADF8\uAC00 \uC788\uB294\uC9C0 \uD655\uC778", /*#__PURE__*/React.createElement("br", null), "2. databaseURL\uC774 \uC62C\uBC14\uB978\uC9C0 \uD655\uC778", /*#__PURE__*/React.createElement("br", null), "3. Firebase \uCF58\uC194\uC5D0\uC11C Realtime Database\uAC00 \uD65C\uC131\uD654\uB410\uB294\uC9C0 \uD655\uC778")));
+    return /*#__PURE__*/React.createElement("div", { style: { minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#FFF8E7', padding: 24 } },
+      /*#__PURE__*/React.createElement("div", { style: { maxWidth: 480, textAlign: 'center', background: 'white', borderRadius: 24, padding: 36, border: '3px solid #F2C98A', boxShadow: '0 8px 0 #F2C98A' } },
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 64, marginBottom: 12 } }, "\uD83D\uDD25"),
+        /*#__PURE__*/React.createElement("h2", { style: { fontFamily: 'Jua', color: '#B83C30', margin: '0 0 12px' } }, "Firebase \uC5F0\uACB0 \uC624\uB958"),
+        /*#__PURE__*/React.createElement("p", { style: { fontFamily: 'Gaegu', fontSize: 18, color: '#5A3A22', lineHeight: 1.6, margin: '0 0 24px' } }, fbError),
+        /*#__PURE__*/React.createElement("div", { style: { background: '#FFF3D6', borderRadius: 14, padding: 16, textAlign: 'left', fontFamily: 'Gaegu', fontSize: 15, color: '#8A6B4F' } },
+          /*#__PURE__*/React.createElement("b", null, "\uD574\uACB0 \uBC29\uBC95:"), /*#__PURE__*/React.createElement("br", null), "1. index.html\uC5D0 Firebase SDK script \uD0DC\uADF8\uAC00 \uC788\uB294\uC9C0 \uD655\uC778", /*#__PURE__*/React.createElement("br", null), "2. databaseURL\uC774 \uC62C\uBC14\uB978\uC9C0 \uD655\uC778", /*#__PURE__*/React.createElement("br", null), "3. Firebase \uCF58\uC194\uC5D0\uC11C Realtime Database\uAC00 \uD65C\uC131\uD654\uB410\uB294\uC9C0 \uD655\uC778")));
   }
 
-  // 연결 중 화면
   if (!synced) {
-    return /*#__PURE__*/React.createElement("div", {
-      style: {
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'linear-gradient(160deg, #C9ECF2 0%, #FFF3D6 60%, #FFE6A8 100%)'
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        textAlign: 'center'
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 72,
-        marginBottom: 16,
-        animation: 'float-y 1.5s ease-in-out infinite'
-      }
-    }, "\uD83C\uDFD8\uFE0F"), /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontFamily: 'Jua',
-        fontSize: 28,
-        color: '#8E5A2E',
-        marginBottom: 8
-      }
-    }, "\uB9C8\uC744 \uC5F0\uACB0 \uC911..."), /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontFamily: 'Gaegu',
-        fontSize: 18,
-        color: '#8A6B4F'
-      }
-    }, "Firebase\uC5D0 \uC811\uC18D\uD558\uACE0 \uC788\uC5B4\uC694 \uD83D\uDD25")));
+    return /*#__PURE__*/React.createElement("div", { style: { minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg, #C9ECF2 0%, #FFF3D6 60%, #FFE6A8 100%)' } },
+      /*#__PURE__*/React.createElement("div", { style: { textAlign: 'center' } },
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 72, marginBottom: 16, animation: 'float-y 1.5s ease-in-out infinite' } }, "\uD83C\uDFD8\uFE0F"),
+        /*#__PURE__*/React.createElement("div", { style: { fontFamily: 'Jua', fontSize: 28, color: '#8E5A2E', marginBottom: 8 } }, "\uB9C8\uC744 \uC5F0\uACB0 \uC911..."),
+        /*#__PURE__*/React.createElement("div", { style: { fontFamily: 'Gaegu', fontSize: 18, color: '#8A6B4F' } }, "Firebase\uC5D0 \uC811\uC18D\uD558\uACE0 \uC788\uC5B4\uC694 \uD83D\uDD25")));
   }
 
-  // 화면 라우팅
-  if (mode === 'teacher') {
-    return /*#__PURE__*/React.createElement(TeacherBoard, {
-      gameState: gameState,
-      saveState: saveState,
-      resetState: resetState,
-      setMode: setMode
-    });
-  }
-  if (mode === 'student' && activeGroup) {
-    return /*#__PURE__*/React.createElement(StudentCalc, {
-      gameState: gameState,
-      saveState: saveState,
-      setMode: setMode,
-      activeGroup: activeGroup
-    });
-  }
-  return /*#__PURE__*/React.createElement(StartScreen, {
-    gameState: gameState,
-    saveState: saveState,
-    setMode: setMode,
-    setActiveGroup: setActiveGroup
-  });
+  if (mode === 'teacher') return /*#__PURE__*/React.createElement(TeacherBoard, { gameState: gameState, saveState: saveState, resetState: resetState, setMode: setMode });
+  if (mode === 'student' && activeGroup) return /*#__PURE__*/React.createElement(StudentCalc, { gameState: gameState, saveState: saveState, setMode: setMode, activeGroup: activeGroup });
+  return /*#__PURE__*/React.createElement(StartScreen, { gameState: gameState, saveState: saveState, setMode: setMode, setActiveGroup: setActiveGroup });
 }
 
 // ─────────────────────────────────────────────────────────────
 //  시작 화면
 // ─────────────────────────────────────────────────────────────
 function StartScreen(_ref3) {
-  var gameState = _ref3.gameState,
-    saveState = _ref3.saveState,
-    setMode = _ref3.setMode,
-    setActiveGroup = _ref3.setActiveGroup;
-  var round = gameState.round,
-    groups = gameState.groups || {};
+  var gameState = _ref3.gameState, saveState = _ref3.saveState, setMode = _ref3.setMode, setActiveGroup = _ref3.setActiveGroup;
+  var round = gameState.round, groups = gameState.groups || {};
   var enterGroup = function enterGroup(n) {
     var newGroups = _objectSpread({}, groups);
     if (!newGroups[String(n)]) {
       newGroups[String(n)] = INIT_GROUP(n);
-      saveState(_objectSpread(_objectSpread({}, gameState), {}, {
-        groups: newGroups
-      }));
+      saveState(_objectSpread(_objectSpread({}, gameState), {}, { groups: newGroups }));
     }
     setActiveGroup(String(n));
     setMode('student');
   };
-  return /*#__PURE__*/React.createElement("div", {
-    className: "sky-bg",
-    style: {
-      minHeight: '100vh',
-      padding: '32px 20px 60px',
-      position: 'relative'
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      position: 'absolute',
-      top: 30,
-      left: '8%',
-      fontSize: 38,
-      animation: 'float-y 4s ease-in-out infinite'
-    }
-  }, "\uD83C\uDF33"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      position: 'absolute',
-      top: 80,
-      right: '10%',
-      fontSize: 32,
-      animation: 'float-y 3.5s ease-in-out infinite'
-    }
-  }, "\uD83C\uDF37"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      position: 'absolute',
-      bottom: 40,
-      left: '12%',
-      fontSize: 36,
-      animation: 'float-y 4.5s ease-in-out infinite'
-    }
-  }, "\uD83E\uDD8B"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      position: 'absolute',
-      bottom: 60,
-      right: '8%',
-      fontSize: 34,
-      animation: 'float-y 3s ease-in-out infinite'
-    }
-  }, "\uD83D\uDC24"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      maxWidth: 720,
-      margin: '0 auto',
-      textAlign: 'center'
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: 8,
-      background: 'rgba(108,255,177,0.15)',
-      border: '2px solid rgba(108,255,177,0.6)',
-      borderRadius: 999,
-      padding: '4px 14px',
-      fontFamily: 'Jua',
-      fontSize: 13,
-      color: '#2E6B4F',
-      marginBottom: 12
-    }
-  }, /*#__PURE__*/React.createElement("span", {
-    style: {
-      width: 8,
-      height: 8,
-      borderRadius: '50%',
-      background: '#4F8A2E',
-      display: 'inline-block',
-      boxShadow: '0 0 6px #4F8A2E'
-    }
-  }), "\uD83D\uDD25 Firebase \uC2E4\uC2DC\uAC04 \uC5F0\uACB0\uB428"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: 10,
-      background: 'rgba(255,255,255,0.7)',
-      borderRadius: 999,
-      padding: '6px 16px',
-      fontFamily: 'Jua',
-      fontSize: 14,
-      color: 'var(--wood-deep)',
-      marginBottom: 18,
-      border: '2px solid var(--wood-light)'
-    }
-  }, "\uD83C\uDFAE v3 Firebase \xB7 \uACBD\uC81C \uC21C\uD658 \uC2DC\uC2A4\uD15C"), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
-    className: "pennant"
-  }, "\uD83C\uDFD8\uFE0F \uC6B0\uB9AC \uB9C8\uC744 \uACBD\uC81C \uB9E4\uB2C8\uC800")), /*#__PURE__*/React.createElement("p", {
-    style: {
-      fontFamily: 'Gaegu',
-      fontSize: 22,
-      color: 'var(--wood-deep)',
-      margin: '28px 0 4px'
-    }
-  }, "\uBE48 \uB545\uC5D0\uC11C \uC2DC\uC791\uD574, \uC6B0\uB9AC \uBAA8\uB460\uB9CC\uC758 \uB9C8\uC744\uC744 \uD0A4\uC6CC\uBD10!"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      marginTop: 6
-    }
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "ribbon"
-  }, "\uD83D\uDCC5 \uD604\uC7AC \uC9C4\uD589 \u2014 ", ROUND_LABELS[String(round)])), /*#__PURE__*/React.createElement("div", {
-    className: "plate",
-    style: {
-      marginTop: 36,
-      padding: '32px 24px'
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginBottom: 14,
-      flexWrap: 'wrap',
-      gap: 10
-    }
-  }, /*#__PURE__*/React.createElement("h2", {
-    style: {
-      fontFamily: 'Jua',
-      fontSize: 26,
-      margin: 0,
-      color: 'var(--ink)'
-    }
-  }, "\uD83D\uDC4B \uC5B4\uB290 \uBAA8\uB460\uC73C\uB85C \uB4E4\uC5B4\uAC08\uAE4C?"), /*#__PURE__*/React.createElement("span", {
-    className: "tag-num",
-    style: {
-      fontSize: 13,
-      padding: '4px 12px'
-    }
-  }, "\uD83D\uDC68\u200D\uD83C\uDF93 \uD559\uC0DD \uC785\uB825\uAE30")), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-      gap: 16,
-      marginTop: 6
-    }
-  }, [1, 2, 3, 4].map(function (n) {
-    var isDone = groups[String(n)] && groups[String(n)].lastSubmittedRound === round;
-    var t = VILLAGE_THEME[String(n)];
-    var g = groups[String(n)];
-    return /*#__PURE__*/React.createElement("button", {
-      key: n,
-      onClick: function onClick() {
-        return !isDone && enterGroup(n);
-      },
-      className: "village-card ".concat(t.cls, " ").concat(isDone ? 'done' : ''),
-      disabled: isDone,
-      style: {
-        border: 'none',
-        cursor: isDone ? 'default' : 'pointer'
-      }
-    }, isDone && /*#__PURE__*/React.createElement("span", {
-      className: "stamp"
-    }, "\uC644\uB8CC \u2713"), /*#__PURE__*/React.createElement("div", {
-      className: "roof"
-    }, t.roof), /*#__PURE__*/React.createElement("h3", null, n, "\uBAA8\uB460"), /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontFamily: 'Gaegu',
-        fontSize: 15,
-        opacity: 0.8,
-        marginTop: -2
-      }
-    }, t.tag), g && /*#__PURE__*/React.createElement("div", {
-      className: "mini"
-    }, /*#__PURE__*/React.createElement("span", null, "\uD83D\uDCB0 ", g.coins), /*#__PURE__*/React.createElement("span", null, "\uD83D\uDC9A ", calcHappiness(g.happyBase, g.facilities))), !g && /*#__PURE__*/React.createElement("div", {
-      className: "mini"
-    }, /*#__PURE__*/React.createElement("span", null, "\uC0C8 \uB9C8\uC744 \uC2DC\uC791 \u2192")));
-  })), /*#__PURE__*/React.createElement("div", {
-    style: {
-      marginTop: 28,
-      paddingTop: 22,
-      borderTop: '2px dashed #F2D9A8'
-    }
-  }, /*#__PURE__*/React.createElement("button", {
-    onClick: function onClick() {
-      return setMode('teacher');
-    },
-    className: "btn3d navy",
-    style: {
-      width: '100%',
-      fontSize: 20
-    }
-  }, "\uD83D\uDCFA \uC120\uC0DD\uB2D8 \uB300\uC2DC\uBCF4\uB4DC (\uAD50\uC2E4 TV\uC6A9)"), /*#__PURE__*/React.createElement("p", {
-    style: {
-      fontFamily: 'Gaegu',
-      fontSize: 16,
-      color: 'var(--ink-soft)',
-      margin: '10px 0 0'
-    }
-  }, "4\uBAA8\uB460 \uD604\uD669\uC744 \uD55C\uB208\uC5D0 \u2014 \uD559\uC0DD\uC774 \uC785\uB825\uD558\uBA74 \uC790\uB3D9\uC73C\uB85C \uBC18\uC601\uB429\uB2C8\uB2E4 \uD83D\uDD25"))), /*#__PURE__*/React.createElement("p", {
-    style: {
-      fontFamily: 'Gaegu',
-      fontSize: 16,
-      color: 'var(--ink-soft)',
-      marginTop: 28
-    }
-  }, "\uD83C\uDF1F \uC790\uC6D0\uC744 \uBAA8\uC73C\uACE0, \uC2DC\uC124\uC744 \uC9D3\uACE0, \uC774\uC6C3 \uB9C8\uC744\uACFC \uAD50\uB958\uD558\uBA70 \uC6B0\uB9AC \uBAA8\uB460 \uBAA9\uD45C\uB97C \uB2EC\uC131\uD558\uC790!")));
+  return /*#__PURE__*/React.createElement("div", { className: "sky-bg", style: { minHeight: '100vh', padding: '32px 20px 60px', position: 'relative' } },
+    /*#__PURE__*/React.createElement("div", { style: { position: 'absolute', top: 30, left: '8%', fontSize: 38, animation: 'float-y 4s ease-in-out infinite' } }, "\uD83C\uDF33"),
+    /*#__PURE__*/React.createElement("div", { style: { position: 'absolute', top: 80, right: '10%', fontSize: 32, animation: 'float-y 3.5s ease-in-out infinite' } }, "\uD83C\uDF37"),
+    /*#__PURE__*/React.createElement("div", { style: { position: 'absolute', bottom: 40, left: '12%', fontSize: 36, animation: 'float-y 4.5s ease-in-out infinite' } }, "\uD83E\uDD8B"),
+    /*#__PURE__*/React.createElement("div", { style: { position: 'absolute', bottom: 60, right: '8%', fontSize: 34, animation: 'float-y 3s ease-in-out infinite' } }, "\uD83D\uDC24"),
+    /*#__PURE__*/React.createElement("div", { style: { maxWidth: 720, margin: '0 auto', textAlign: 'center' } },
+      /*#__PURE__*/React.createElement("div", { style: { display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(108,255,177,0.15)', border: '2px solid rgba(108,255,177,0.6)', borderRadius: 999, padding: '4px 14px', fontFamily: 'Jua', fontSize: 13, color: '#2E6B4F', marginBottom: 12 } },
+        /*#__PURE__*/React.createElement("span", { style: { width: 8, height: 8, borderRadius: '50%', background: '#4F8A2E', display: 'inline-block', boxShadow: '0 0 6px #4F8A2E' } }), "\uD83D\uDD25 Firebase \uC2E4\uC2DC\uAC04 \uC5F0\uACB0\uB428"),
+      /*#__PURE__*/React.createElement("div", { style: { display: 'inline-flex', alignItems: 'center', gap: 10, background: 'rgba(255,255,255,0.7)', borderRadius: 999, padding: '6px 16px', fontFamily: 'Jua', fontSize: 14, color: 'var(--wood-deep)', marginBottom: 18, border: '2px solid var(--wood-light)' } }, "\uD83C\uDFAE v3 Firebase \xB7 \uACBD\uC81C \uC21C\uD658 \uC2DC\uC2A4\uD15C"),
+      /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", { className: "pennant" }, "\uD83C\uDFD8\uFE0F \uC6B0\uB9AC \uB9C8\uC744 \uACBD\uC81C \uB9E4\uB2C8\uC800")),
+      /*#__PURE__*/React.createElement("p", { style: { fontFamily: 'Gaegu', fontSize: 22, color: 'var(--wood-deep)', margin: '28px 0 4px' } }, "\uBE48 \uB545\uC5D0\uC11C \uC2DC\uC791\uD574, \uC6B0\uB9AC \uBAA8\uB460\uB9CC\uC758 \uB9C8\uC744\uC744 \uD0A4\uC6CC\uBD10!"),
+      /*#__PURE__*/React.createElement("div", { style: { marginTop: 6 } }, /*#__PURE__*/React.createElement("span", { className: "ribbon" }, "\uD83D\uDCC5 \uD604\uC7AC \uC9C4\uD589 \u2014 ", ROUND_LABELS[String(round)])),
+      /*#__PURE__*/React.createElement("div", { className: "plate", style: { marginTop: 36, padding: '32px 24px' } },
+        /*#__PURE__*/React.createElement("div", { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, flexWrap: 'wrap', gap: 10 } },
+          /*#__PURE__*/React.createElement("h2", { style: { fontFamily: 'Jua', fontSize: 26, margin: 0, color: 'var(--ink)' } }, "\uD83D\uDC4B \uC5B4\uB290 \uBAA8\uB460\uC73C\uB85C \uB4E4\uC5B4\uAC08\uAE4C?"),
+          /*#__PURE__*/React.createElement("span", { className: "tag-num", style: { fontSize: 13, padding: '4px 12px' } }, "\uD83D\uDC68\u200D\uD83C\uDF93 \uD559\uC0DD \uC785\uB825\uAE30")),
+        /*#__PURE__*/React.createElement("div", { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 16, marginTop: 6 } },
+          [1, 2, 3, 4].map(function (n) {
+            var isDone = groups[String(n)] && groups[String(n)].lastSubmittedRound === round;
+            var t = VILLAGE_THEME[String(n)];
+            var g = groups[String(n)];
+            return /*#__PURE__*/React.createElement("button", { key: n, onClick: function onClick() { return !isDone && enterGroup(n); }, className: "village-card ".concat(t.cls, " ").concat(isDone ? 'done' : ''), disabled: isDone, style: { border: 'none', cursor: isDone ? 'default' : 'pointer' } },
+              isDone && /*#__PURE__*/React.createElement("span", { className: "stamp" }, "\uC644\uB8CC \u2713"),
+              /*#__PURE__*/React.createElement("div", { className: "roof" }, t.roof),
+              /*#__PURE__*/React.createElement("h3", null, n, "\uBAA8\uB460"),
+              /*#__PURE__*/React.createElement("div", { style: { fontFamily: 'Gaegu', fontSize: 15, opacity: 0.8, marginTop: -2 } }, t.tag),
+              g && /*#__PURE__*/React.createElement("div", { className: "mini" }, /*#__PURE__*/React.createElement("span", null, "\uD83D\uDCB0 ", g.coins), /*#__PURE__*/React.createElement("span", null, "\uD83D\uDC9A ", calcHappiness(g.happyBase, g.facilities))),
+              !g && /*#__PURE__*/React.createElement("div", { className: "mini" }, /*#__PURE__*/React.createElement("span", null, "\uC0C8 \uB9C8\uC744 \uC2DC\uC791 \u2192")));
+          })),
+        /*#__PURE__*/React.createElement("div", { style: { marginTop: 28, paddingTop: 22, borderTop: '2px dashed #F2D9A8' } },
+          /*#__PURE__*/React.createElement("button", { onClick: function onClick() { return setMode('teacher'); }, className: "btn3d navy", style: { width: '100%', fontSize: 20 } }, "\uD83D\uDCFA \uC120\uC0DD\uB2D8 \uB300\uC2DC\uBCF4\uB4DC (\uAD50\uC2E4 TV\uC6A9)"),
+          /*#__PURE__*/React.createElement("p", { style: { fontFamily: 'Gaegu', fontSize: 16, color: 'var(--ink-soft)', margin: '10px 0 0' } }, "4\uBAA8\uB460 \uD604\uD669\uC744 \uD55C\uB208\uC5D0 \u2014 \uD559\uC0DD\uC774 \uC785\uB825\uD558\uBA74 \uC790\uB3D9\uC73C\uB85C \uBC18\uC601\uB429\uB2C8\uB2E4 \uD83D\uDD25"))),
+      /*#__PURE__*/React.createElement("p", { style: { fontFamily: 'Gaegu', fontSize: 16, color: 'var(--ink-soft)', marginTop: 28 } }, "\uD83C\uDF1F \uC790\uC6D0\uC744 \uBAA8\uC73C\uACE0, \uC2DC\uC124\uC744 \uC9D3\uACE0, \uC774\uC6C3 \uB9C8\uC744\uACFC \uAD50\uB958\uD558\uBA70 \uC6B0\uB9AC \uBAA8\uB460 \uBAA9\uD45C\uB97C \uB2EC\uC131\uD558\uC790!")));
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -1775,25 +1310,39 @@ function StartScreen(_ref3) {
 // ─────────────────────────────────────────────────────────────
 function StudentCalc(_ref4) {
   var _group$coins;
-  var gameState = _ref4.gameState,
-    saveState = _ref4.saveState,
-    setMode = _ref4.setMode,
-    activeGroup = _ref4.activeGroup;
+  var gameState = _ref4.gameState, saveState = _ref4.saveState, setMode = _ref4.setMode, activeGroup = _ref4.activeGroup;
   var gIdx = activeGroup;
   var group = gameState.groups[String(gIdx)];
-  var _useState13 = useState(EMPTY_ROUND_INPUT()),
-    _useState14 = _slicedToArray(_useState13, 2),
-    ri = _useState14[0],
-    setRi = _useState14[1];
-  var _useState15 = useState(false),
-    _useState16 = _slicedToArray(_useState15, 2),
-    showConfirm = _useState16[0],
-    setShowConfirm = _useState16[1];
-  var _useState17 = useState(false),
-    _useState18 = _slicedToArray(_useState17, 2),
-    saving = _useState18[0],
-    setSaving = _useState18[1];
+  var _useState13 = useState(EMPTY_ROUND_INPUT()), _useState14 = _slicedToArray(_useState13, 2), ri = _useState14[0], setRi = _useState14[1];
+  var _useState15 = useState(false), _useState16 = _slicedToArray(_useState15, 2), showConfirm = _useState16[0], setShowConfirm = _useState16[1];
+  var _useState17 = useState(false), _useState18 = _slicedToArray(_useState17, 2), saving = _useState18[0], setSaving = _useState18[1];
+  
   if (!group) return null;
+
+  // 1. 이벤트 수동 적용 함수
+  var handleApplyEvent = function handleApplyEvent() {
+    var updatedGroup = _objectSpread({}, group);
+    var r = gameState.round;
+
+    if (r === 4) {
+      var penalty = updatedGroup.facilities && updatedGroup.facilities.hospital > 0 ? 5 : 10;
+      updatedGroup.happyBase = Math.max(0, (updatedGroup.happyBase || 50) - penalty);
+    } else if (r === 5 && updatedGroup.facilities && updatedGroup.facilities.school > 0) {
+      updatedGroup.happyBase = Math.min(100, (updatedGroup.happyBase || 50) + 5);
+    } else if (r === 6 && updatedGroup.facilities && updatedGroup.facilities.tourist > 0) {
+      updatedGroup.happyBase = Math.min(100, (updatedGroup.happyBase || 50) + 5);
+      updatedGroup.coins = (updatedGroup.coins || 0) + 3;
+    } else if (r === 7 && updatedGroup.facilities && updatedGroup.facilities.farm >= 2) {
+      updatedGroup.coins = (updatedGroup.coins || 0) + 5;
+    }
+
+    updatedGroup.eventAppliedRound = r;
+
+    saveState(_objectSpread(_objectSpread({}, gameState), {}, {
+      groups: _objectSpread(_objectSpread({}, gameState.groups), {}, _defineProperty({}, String(gIdx), updatedGroup))
+    }));
+  };
+
   var handleUseResource = function handleUseResource(type) {
     var updatedGroup = _objectSpread({}, group);
     if (type === 'medical' && updatedGroup.resources.medical >= 1) {
@@ -1811,84 +1360,29 @@ function StudentCalc(_ref4) {
     }));
   };
 
-  // 정산 완료 화면
   if (group.lastSubmittedRound === gameState.round) {
-    return /*#__PURE__*/React.createElement("div", {
-      className: "sky-bg",
-      style: {
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 24
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      className: "plate",
-      style: {
-        maxWidth: 420,
-        width: '100%',
-        textAlign: 'center',
-        padding: '40px 28px'
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 80,
-        marginBottom: 8,
-        animation: 'float-y 2.5s ease-in-out infinite'
-      }
-    }, "\uD83C\uDF89"), /*#__PURE__*/React.createElement("h2", {
-      style: {
-        fontFamily: 'Jua',
-        fontSize: 30,
-        color: 'var(--leaf-deep)',
-        margin: '0 0 12px'
-      }
-    }, "\uC815\uC0B0 \uC644\uB8CC!"), /*#__PURE__*/React.createElement("p", {
-      style: {
-        fontFamily: 'Gaegu',
-        fontSize: 18,
-        color: 'var(--ink-soft)',
-        lineHeight: 1.5,
-        margin: '0 0 8px'
-      }
-    }, "\uC774 \uBAA8\uB460\uC758 ", /*#__PURE__*/React.createElement("b", {
-      style: {
-        color: 'var(--berry-deep)'
-      }
-    }, gameState.round, "\uB77C\uC6B4\uB4DC"), " \uB370\uC774\uD130\uAC00", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("b", {
-      style: {
-        color: '#4F8A2E'
-      }
-    }, "\uC120\uC0DD\uB2D8 \uD654\uBA74\uC5D0 \uBC14\uB85C \uBC18\uC601"), "\uB418\uC5C8\uC2B5\uB2C8\uB2E4! \uD83D\uDD25"), /*#__PURE__*/React.createElement("div", {
-      style: {
-        background: 'rgba(108,255,177,0.15)',
-        border: '2px solid rgba(108,255,177,0.5)',
-        borderRadius: 14,
-        padding: '10px 16px',
-        margin: '12px 0 24px',
-        fontFamily: 'Gaegu',
-        fontSize: 15,
-        color: '#2E6B4F'
-      }
-    }, "\uD83D\uDCFA \uAD50\uC0AC \uD654\uBA74\uC5D0\uC11C \uC2E4\uC2DC\uAC04\uC73C\uB85C \uD655\uC778\uD560 \uC218 \uC788\uC5B4\uC694!"), /*#__PURE__*/React.createElement("button", {
-      onClick: function onClick() {
-        return setMode('start');
-      },
-      className: "btn3d green",
-      style: {
-        width: '100%'
-      }
-    }, "\uD83C\uDFE0 \uBA54\uC778\uC73C\uB85C \uB3CC\uC544\uAC00\uAE30")));
+    return /*#__PURE__*/React.createElement("div", { className: "sky-bg", style: { minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 } },
+      /*#__PURE__*/React.createElement("div", { className: "plate", style: { maxWidth: 420, width: '100%', textAlign: 'center', padding: '40px 28px' } },
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 80, marginBottom: 8, animation: 'float-y 2.5s ease-in-out infinite' } }, "\uD83C\uDF89"),
+        /*#__PURE__*/React.createElement("h2", { style: { fontFamily: 'Jua', fontSize: 30, color: 'var(--leaf-deep)', margin: '0 0 12px' } }, "\uC815\uC0B0 \uC644\uB8CC!"),
+        /*#__PURE__*/React.createElement("p", { style: { fontFamily: 'Gaegu', fontSize: 18, color: 'var(--ink-soft)', lineHeight: 1.5, margin: '0 0 8px' } }, "\uC774 \uBAA8\uB460\uC758 ", /*#__PURE__*/React.createElement("b", { style: { color: 'var(--berry-deep)' } }, gameState.round, "\uB77C\uC6B4\uB4DC"), " \uB370\uC774\uD130\uAC00", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("b", { style: { color: '#4F8A2E' } }, "\uC120\uC0DD\uB2D8 \uD654\uBA74\uC5D0 \uBC14\uB85C \uBC18\uC601"), "\uB418\uC5C8\uC2B5\uB2C8\uB2E4! \uD83D\uDD25"),
+        /*#__PURE__*/React.createElement("div", { style: { background: 'rgba(108,255,177,0.15)', border: '2px solid rgba(108,255,177,0.5)', borderRadius: 14, padding: '10px 16px', margin: '12px 0 24px', fontFamily: 'Gaegu', fontSize: 15, color: '#2E6B4F' } }, "\uD83D\uDCFA \uAD50\uC0AC \uD654\uBA74\uC5D0\uC11C \uC2E4\uC2DC\uAC04\uC73C\uB85C \uD655\uC778\uD560 \uC218 \uC788\uC5B4\uC694!"),
+        /*#__PURE__*/React.createElement("button", { onClick: function onClick() { return setMode('start'); }, className: "btn3d green", style: { width: '100%' } }, "\uD83C\uDFE0 \uBA54\uC778\uC73C\uB85C \uB3CC\uC544\uAC00\uAE30")));
   }
+
   var buildCost = Object.entries(ri.bought).reduce(function (s, _ref5) {
     var _FACILITIES$id;
-    var _ref6 = _slicedToArray(_ref5, 2),
-      id = _ref6[0],
-      cnt = _ref6[1];
+    var _ref6 = _slicedToArray(_ref5, 2), id = _ref6[0], cnt = _ref6[1];
     return s + (((_FACILITIES$id = FACILITIES[id]) === null || _FACILITIES$id === void 0 ? void 0 : _FACILITIES$id.cost) || 0) * cnt;
   }, 0);
   var coinAfterSettle = ((_group$coins = group.coins) !== null && _group$coins !== void 0 ? _group$coins : 15) - buildCost + (ri.tradeIn.coins || 0) - (ri.tradeOut.coins || 0);
-  var settleDisabled = coinAfterSettle < 0 || saving;
+  
+  // 2. 이벤트 팝업을 띄울지 결정하는 조건문
+  var hasEvent = !!ROUND_EVENTS[String(gameState.round)];
+  var isEventApplied = group.eventAppliedRound === gameState.round;
+  var needsEventPopup = hasEvent && !isEventApplied;
+  var settleDisabled = coinAfterSettle < 0 || saving || needsEventPopup;
+
   var executeApply = /*#__PURE__*/function () {
     var _ref7 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee() {
       var _group$happyBase;
@@ -1901,42 +1395,28 @@ function StudentCalc(_ref4) {
             nextResources = _objectSpread({}, group.resources);
             nextFacilities = _objectSpread({}, group.facilities);
             nextHappyBase = (_group$happyBase = group.happyBase) !== null && _group$happyBase !== void 0 ? _group$happyBase : 50;
-            didTrade = Object.values(ri.tradeIn).some(function (v) {
-              return v > 0;
-            }) || Object.values(ri.tradeOut).some(function (v) {
-              return v > 0;
-            });
+            didTrade = Object.values(ri.tradeIn).some(function (v) { return v > 0; }) || Object.values(ri.tradeOut).some(function (v) { return v > 0; });
             nextTradeCount = (group.tradeCount || 0) + (didTrade ? 1 : 0);
             Object.entries(ri.bought).forEach(function (_ref8) {
-              var _ref9 = _slicedToArray(_ref8, 2),
-                id = _ref9[0],
-                cnt = _ref9[1];
+              var _ref9 = _slicedToArray(_ref8, 2), id = _ref9[0], cnt = _ref9[1];
               if (cnt > 0) nextFacilities[id] = (nextFacilities[id] || 0) + cnt;
             });
             Object.entries(ri.tradeIn).forEach(function (_ref0) {
-              var _ref1 = _slicedToArray(_ref0, 2),
-                res = _ref1[0],
-                val = _ref1[1];
+              var _ref1 = _slicedToArray(_ref0, 2), res = _ref1[0], val = _ref1[1];
               if (res !== 'coins') nextResources[res] = (nextResources[res] || 0) + val;
             });
             Object.entries(ri.tradeOut).forEach(function (_ref10) {
-              var _ref11 = _slicedToArray(_ref10, 2),
-                res = _ref11[0],
-                val = _ref11[1];
+              var _ref11 = _slicedToArray(_ref10, 2), res = _ref11[0], val = _ref11[1];
               if (res !== 'coins') nextResources[res] = (nextResources[res] || 0) - val;
             });
             if (didTrade && nextFacilities.market > 0) nextCoins += 1;
             nextCoins += 5;
             Object.entries(nextFacilities).forEach(function (_ref12) {
               var _FACILITIES$id2;
-              var _ref13 = _slicedToArray(_ref12, 2),
-                id = _ref13[0],
-                cnt = _ref13[1];
+              var _ref13 = _slicedToArray(_ref12, 2), id = _ref13[0], cnt = _ref13[1];
               if (cnt <= 0 || id === 'factory' || !((_FACILITIES$id2 = FACILITIES[id]) !== null && _FACILITIES$id2 !== void 0 && _FACILITIES$id2.prod)) return;
               Object.entries(FACILITIES[id].prod).forEach(function (_ref14) {
-                var _ref15 = _slicedToArray(_ref14, 2),
-                  res = _ref15[0],
-                  amount = _ref15[1];
+                var _ref15 = _slicedToArray(_ref14, 2), res = _ref15[0], amount = _ref15[1];
                 var yieldVal = amount * cnt;
                 if (gameState.round === 3 && res === 'rice') yieldVal = Math.floor(yieldVal * 0.7);
                 nextResources[res] = (nextResources[res] || 0) + yieldVal;
@@ -1959,15 +1439,9 @@ function StudentCalc(_ref4) {
               nextHappyBase = Math.max(0, nextHappyBase - 5);
               nextResources.rice = 0;
             }
-            if (gameState.round === 4) {
-              nextHappyBase = Math.max(0, nextHappyBase - (nextFacilities.hospital > 0 ? 5 : 10));
-            }
-            if (gameState.round === 5 && nextFacilities.school > 0) nextHappyBase += 5;
-            if (gameState.round === 6 && nextFacilities.tourist > 0) {
-              nextHappyBase += 5;
-              nextCoins += 3;
-            }
-            if (gameState.round === 7 && nextFacilities.farm >= 2) nextCoins += 5;
+            
+            // 기존 4~7라운드 하드코딩 부분은 handleApplyEvent로 옮겨졌으므로 이 곳에서는 삭제되었습니다.
+
             updatedGroup = _objectSpread(_objectSpread({}, group), {}, {
               coins: nextCoins,
               happyBase: nextHappyBase,
@@ -1975,7 +1449,7 @@ function StudentCalc(_ref4) {
               facilities: nextFacilities,
               lastSubmittedRound: gameState.round,
               tradeCount: nextTradeCount
-            }); // Firebase에 저장 (교사 화면 자동 갱신)
+            }); 
             saveState(_objectSpread(_objectSpread({}, gameState), {}, {
               groups: _objectSpread(_objectSpread({}, gameState.groups), {}, _defineProperty({}, String(gIdx), updatedGroup))
             }));
@@ -1986,590 +1460,116 @@ function StudentCalc(_ref4) {
         }
       }, _callee);
     }));
-    return function executeApply() {
-      return _ref7.apply(this, arguments);
-    };
+    return function executeApply() { return _ref7.apply(this, arguments); };
   }();
   var happiness = calcHappiness(group.happyBase, group.facilities);
   var theme = VILLAGE_THEME[String(gIdx)];
   return /*#__PURE__*/React.createElement("div", {
     className: "sky-bg",
-    style: {
-      minHeight: '100vh',
-      paddingBottom: 120
-    }
+    style: { minHeight: '100vh', paddingBottom: 120, position: 'relative' }
+  }, 
+  
+  /* 🔥 3. 긴급 속보 이벤트 팝업 (가장 위에 덮어씌우기) */
+  needsEventPopup && /*#__PURE__*/React.createElement("div", {
+    className: "modal-bg",
+    style: { zIndex: 9999, flexDirection: 'column' }
   }, /*#__PURE__*/React.createElement("div", {
-    className: "hud"
+    className: "modal",
+    style: { animation: 'float-y 2s ease-in-out infinite', border: '4px solid #B83C30' }
   }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      maxWidth: 720,
-      margin: '0 auto',
-      padding: '14px 18px',
-      gap: 10,
-      flexWrap: 'wrap'
-    }
-  }, /*#__PURE__*/React.createElement("button", {
-    onClick: function onClick() {
-      return setMode('start');
-    },
-    className: "pill"
-  }, "\u2190 \uBA54\uC778"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: 8
-    }
-  }, /*#__PURE__*/React.createElement("span", {
-    style: {
-      fontSize: 24
-    }
-  }, theme.roof), /*#__PURE__*/React.createElement("span", {
-    style: {
-      fontFamily: 'Jua',
-      fontSize: 22,
-      color: 'var(--ink)'
-    }
-  }, group.name), /*#__PURE__*/React.createElement("span", {
-    className: "ribbon",
-    style: {
-      fontSize: 13,
-      padding: '4px 14px'
-    }
-  }, "R", gameState.round)), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: 'flex',
-      gap: 8
-    }
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "coin-pill"
-  }, "\uD83D\uDCB0 ", group.coins), /*#__PURE__*/React.createElement("span", {
-    className: "heart-pill"
-  }, "\uD83D\uDC9A ", happiness)))), /*#__PURE__*/React.createElement("div", {
-    style: {
-      maxWidth: 720,
-      margin: '0 auto',
-      padding: '24px 18px'
-    }
-  }, ROUND_EVENTS[String(gameState.round)] && /*#__PURE__*/React.createElement("div", {
-    className: "bubble banner-event",
-    style: {
-      marginBottom: 24
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontFamily: 'Jua',
-      fontSize: 20,
-      color: '#A6650F',
-      marginBottom: 4
-    }
-  }, "\uD83D\uDCE2 \uB77C\uC6B4\uB4DC \uC774\uBCA4\uD2B8 \u2014 ", ROUND_EVENTS[String(gameState.round)].name), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontFamily: 'Gaegu',
-      fontSize: 17,
-      color: '#7A4D0C',
-      lineHeight: 1.4
-    }
-  }, ROUND_EVENTS[String(gameState.round)].desc)), /*#__PURE__*/React.createElement("div", {
-    className: "bubble banner-econ",
-    style: {
-      marginBottom: 14
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontFamily: 'Jua',
-      fontSize: 16,
-      color: '#5A2D8A'
-    }
-  }, "\uD83C\uDFDB\uFE0F \uAE30\uBCF8 \uACBD\uC81C \u2014 \uC815\uC0B0 \uC2DC ", /*#__PURE__*/React.createElement("b", {
-    style: {
-      color: 'var(--leaf-deep)'
-    }
-  }, "+5 \uCF54\uC778"), " \uB4E4\uC5B4\uC624\uACE0, ", /*#__PURE__*/React.createElement("b", {
-    style: {
-      color: 'var(--berry-deep)'
-    }
-  }, "\uC300 2\uAC1C"), " \uC18C\uBE44!")), /*#__PURE__*/React.createElement("div", {
-    className: "bubble banner-info-blue",
-    style: {
-      marginBottom: 24
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontFamily: 'Gaegu',
-      fontSize: 17,
-      color: 'var(--in-ink)'
-    }
-  }, "\uD83D\uDCA1 ", /*#__PURE__*/React.createElement("b", null, "\uAFC0\uD301!"), " \uCF54\uC778\uC774 \uBD80\uC871\uD560 \uB550 \uC6B0\uB9AC \uB9C8\uC744\uC758 ", /*#__PURE__*/React.createElement("b", null, "\uB0A8\uB294 \uC790\uC6D0\uC744 \uC774\uC6C3 \uB9C8\uC744\uC5D0 \uD314\uC544\uC11C"), " \uCF54\uC778\uC744 \uBC8C\uC5B4\uBCF4\uC138\uC694!")), /*#__PURE__*/React.createElement(SectionTitle, {
-    icon: "\u2728",
-    text: "\uC790\uC6D0 \uC989\uC2DC \uC0AC\uC6A9\uD558\uAE30",
-    sub: "(\uC218\uC694 \uCC3D\uCD9C)",
-    accent: "#4F8A2E"
-  }), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: 'grid',
-      gridTemplateColumns: '1fr 1fr 1fr',
-      gap: 12,
-      marginBottom: 28
-    }
-  }, /*#__PURE__*/React.createElement(UseResourceCard, {
-    available: (group.resources.medical || 0) >= 1,
-    theme: {
-      '--c-bg-1': '#FFFFFF',
-      '--c-bg-2': '#DBEEFF',
-      '--c-border': '#7DB7E8',
-      '--c-shadow': '#7DB7E8',
-      '--c-ink': '#1A4F7A'
-    },
-    emoji: "\uD83C\uDFE5",
-    label: "\uC758\uB8CC \uC4F0\uAE30",
-    effect: "\uD589\uBCF5 +5",
-    stock: group.resources.medical || 0,
-    onClick: function onClick() {
-      return handleUseResource('medical');
-    }
-  }), /*#__PURE__*/React.createElement(UseResourceCard, {
-    available: (group.resources.culture || 0) >= 1,
-    theme: {
-      '--c-bg-1': '#FFFFFF',
-      '--c-bg-2': '#F1E2FA',
-      '--c-border': '#C8A0E6',
-      '--c-shadow': '#C8A0E6',
-      '--c-ink': '#5A2D8A'
-    },
-    emoji: "\uD83C\uDFAD",
-    label: "\uBB38\uD654 \uC4F0\uAE30",
-    effect: "\uD589\uBCF5 +3",
-    stock: group.resources.culture || 0,
-    onClick: function onClick() {
-      return handleUseResource('culture');
-    }
-  }), /*#__PURE__*/React.createElement(UseResourceCard, {
-    available: (group.resources.product || 0) >= 1,
-    theme: {
-      '--c-bg-1': '#FFFFFF',
-      '--c-bg-2': '#FFF1B5',
-      '--c-border': '#F2C260',
-      '--c-shadow': '#F2C260',
-      '--c-ink': '#7A4D0C'
-    },
-    emoji: "\uD83C\uDFED",
-    label: "\uC81C\uD488 \uC218\uCD9C",
-    effect: "\uCF54\uC778 +2",
-    stock: group.resources.product || 0,
-    onClick: function onClick() {
-      return handleUseResource('product');
-    }
-  })), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: 'grid',
-      gridTemplateColumns: '1fr 1fr',
-      gap: 14,
-      marginBottom: 28
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "plate-soft",
-    style: {
-      padding: 16
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontFamily: 'Jua',
-      fontSize: 16,
-      color: 'var(--wood-deep)',
-      marginBottom: 10
-    }
-  }, "\uD83D\uDCE6 \uBCF4\uC720 \uC790\uC6D0"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: 'grid',
-      gridTemplateColumns: '1fr 1fr',
-      gap: 8
-    }
-  }, Object.entries(RESOURCES).map(function (_ref16) {
-    var _ref17 = _slicedToArray(_ref16, 2),
-      id = _ref17[0],
-      r = _ref17[1];
-    return /*#__PURE__*/React.createElement("div", {
-      key: id,
-      className: "chip",
-      style: {
-        padding: '6px 10px'
-      }
-    }, /*#__PURE__*/React.createElement("span", {
-      className: "ic"
-    }, r.icon), /*#__PURE__*/React.createElement("span", {
-      style: {
-        fontSize: 13
-      }
-    }, r.name), /*#__PURE__*/React.createElement("span", {
-      className: "num"
-    }, group.resources[id] || 0));
-  }))), /*#__PURE__*/React.createElement("div", {
-    className: "plate-soft",
-    style: {
-      padding: 16
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontFamily: 'Jua',
-      fontSize: 16,
-      color: 'var(--wood-deep)',
-      marginBottom: 10
-    }
-  }, "\uD83C\uDFD7\uFE0F \uBCF4\uC720 \uC2DC\uC124"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: 'grid',
-      gridTemplateColumns: '1fr 1fr',
-      gap: 8
-    }
-  }, Object.entries(FACILITIES).map(function (_ref18) {
-    var _ref19 = _slicedToArray(_ref18, 2),
-      id = _ref19[0],
-      f = _ref19[1];
-    return /*#__PURE__*/React.createElement("div", {
-      key: id,
-      className: "chip",
-      style: {
-        padding: '6px 10px'
-      }
-    }, /*#__PURE__*/React.createElement("span", {
-      className: "ic"
-    }, f.icon), /*#__PURE__*/React.createElement("span", {
-      style: {
-        fontSize: 13
-      }
-    }, f.name), /*#__PURE__*/React.createElement("span", {
-      className: "num"
-    }, group.facilities[id] || 0));
-  })))), /*#__PURE__*/React.createElement(SectionTitle, {
-    icon: "\uD83E\uDDF1",
-    text: "\uC2DC\uC124 \uAC74\uC124",
-    sub: "\uB0A8\uC740 \uCF54\uC778: ".concat(coinAfterSettle),
-    accent: "var(--wood-deep)"
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "plate-soft",
-    style: {
-      padding: 16,
-      marginBottom: 28
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: 'grid',
-      gridTemplateColumns: '1fr 1fr',
-      gap: 10
-    }
-  }, Object.entries(FACILITIES).map(function (_ref20) {
-    var _ref21 = _slicedToArray(_ref20, 2),
-      id = _ref21[0],
-      f = _ref21[1];
-    return /*#__PURE__*/React.createElement("div", {
-      key: id,
-      className: "fac-row"
-    }, /*#__PURE__*/React.createElement("div", {
-      className: "ic"
-    }, f.icon), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
-      className: "nm"
-    }, f.name), /*#__PURE__*/React.createElement("div", {
-      className: "cost"
-    }, "\uD83D\uDCB0 ", f.cost)), /*#__PURE__*/React.createElement("div", {
-      className: "ctr"
-    }, /*#__PURE__*/React.createElement("button", {
-      className: "qbtn minus",
-      disabled: ri.bought[id] === 0,
-      onClick: function onClick() {
-        return setRi(function (r) {
-          return _objectSpread(_objectSpread({}, r), {}, {
-            bought: _objectSpread(_objectSpread({}, r.bought), {}, _defineProperty({}, id, Math.max(0, r.bought[id] - 1)))
-          });
-        });
-      }
-    }, "\u2212"), /*#__PURE__*/React.createElement("span", {
-      className: "num"
-    }, ri.bought[id]), /*#__PURE__*/React.createElement("button", {
-      className: "qbtn plus",
-      onClick: function onClick() {
-        return setRi(function (r) {
-          return _objectSpread(_objectSpread({}, r), {}, {
-            bought: _objectSpread(_objectSpread({}, r.bought), {}, _defineProperty({}, id, r.bought[id] + 1))
-          });
-        });
-      }
-    }, "+")));
-  })), /*#__PURE__*/React.createElement("div", {
-    style: {
-      marginTop: 14,
-      padding: '10px 14px',
-      background: '#FFF8E0',
-      borderRadius: 14,
-      border: '2px dashed #F2C260',
-      fontFamily: 'Gaegu',
-      fontSize: 16,
-      color: '#7A4D0C',
-      textAlign: 'center'
-    }
-  }, "\uD83D\uDD28 \uAC74\uC124\uBE44 \uD569\uACC4 : ", /*#__PURE__*/React.createElement("b", null, buildCost), " \uCF54\uC778")), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      marginBottom: 12
-    }
-  }, /*#__PURE__*/React.createElement(SectionTitle, {
-    icon: "\uD83E\uDD1D",
-    text: "\uAD50\uB958 \uD611\uC0C1 \uACB0\uACFC",
-    accent: "var(--ocean-deep)",
-    inline: true
-  }), /*#__PURE__*/React.createElement("span", {
-    className: "tag-num"
-  }, "\uD604\uC7AC \uAD50\uB958 \uD69F\uC218: ", group.tradeCount || 0, "\uD68C")), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: 'grid',
-      gridTemplateColumns: '1fr 1fr',
-      gap: 14,
-      marginBottom: 28
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "trade-panel in"
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontFamily: 'Jua',
-      fontSize: 16,
-      color: 'var(--in-ink)',
-      marginBottom: 10,
-      display: 'flex',
-      alignItems: 'center',
-      gap: 6
-    }
-  }, /*#__PURE__*/React.createElement("span", {
-    style: {
-      background: 'var(--in-ink)',
-      color: 'white',
-      borderRadius: 999,
-      width: 22,
-      height: 22,
-      display: 'inline-flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontSize: 14
-    }
-  }, "+"), "\uBC1B\uC740 \uC790\uC6D0 / \uCF54\uC778"), Object.keys(RESOURCES).map(function (id) {
-    return /*#__PURE__*/React.createElement("div", {
-      key: id,
-      className: "trade-row"
-    }, /*#__PURE__*/React.createElement("span", {
-      className: "ic"
-    }, RESOURCES[id].icon), /*#__PURE__*/React.createElement("span", {
-      className: "nm"
-    }, RESOURCES[id].name), /*#__PURE__*/React.createElement("input", {
-      className: "trade-input",
-      type: "number",
-      min: "0",
-      value: ri.tradeIn[id],
-      onChange: function onChange(e) {
-        return setRi(function (r) {
-          return _objectSpread(_objectSpread({}, r), {}, {
-            tradeIn: _objectSpread(_objectSpread({}, r.tradeIn), {}, _defineProperty({}, id, parseInt(e.target.value) || 0))
-          });
-        });
-      }
-    }));
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "trade-row",
-    style: {
-      marginTop: 6,
-      background: 'rgba(255,255,255,0.6)',
-      borderRadius: 12
-    }
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "ic"
-  }, "\uD83D\uDCB0"), /*#__PURE__*/React.createElement("span", {
-    className: "nm",
-    style: {
-      fontWeight: 'bold'
-    }
-  }, "\uCF54\uC778"), /*#__PURE__*/React.createElement("input", {
-    className: "trade-input",
-    type: "number",
-    min: "0",
-    value: ri.tradeIn.coins,
-    onChange: function onChange(e) {
-      return setRi(function (r) {
-        return _objectSpread(_objectSpread({}, r), {}, {
-          tradeIn: _objectSpread(_objectSpread({}, r.tradeIn), {}, {
-            coins: parseInt(e.target.value) || 0
-          })
-        });
-      });
-    }
-  }))), /*#__PURE__*/React.createElement("div", {
-    className: "trade-panel out"
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontFamily: 'Jua',
-      fontSize: 16,
-      color: 'var(--out-ink)',
-      marginBottom: 10,
-      display: 'flex',
-      alignItems: 'center',
-      gap: 6
-    }
-  }, /*#__PURE__*/React.createElement("span", {
-    style: {
-      background: 'var(--out-ink)',
-      color: 'white',
-      borderRadius: 999,
-      width: 22,
-      height: 22,
-      display: 'inline-flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontSize: 14
-    }
-  }, "\u2212"), "\uC900 \uC790\uC6D0 / \uCF54\uC778"), Object.keys(RESOURCES).map(function (id) {
-    return /*#__PURE__*/React.createElement("div", {
-      key: id,
-      className: "trade-row"
-    }, /*#__PURE__*/React.createElement("span", {
-      className: "ic"
-    }, RESOURCES[id].icon), /*#__PURE__*/React.createElement("span", {
-      className: "nm"
-    }, RESOURCES[id].name), /*#__PURE__*/React.createElement("input", {
-      className: "trade-input",
-      type: "number",
-      min: "0",
-      value: ri.tradeOut[id],
-      onChange: function onChange(e) {
-        return setRi(function (r) {
-          return _objectSpread(_objectSpread({}, r), {}, {
-            tradeOut: _objectSpread(_objectSpread({}, r.tradeOut), {}, _defineProperty({}, id, parseInt(e.target.value) || 0))
-          });
-        });
-      }
-    }));
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "trade-row",
-    style: {
-      marginTop: 6,
-      background: 'rgba(255,255,255,0.6)',
-      borderRadius: 12
-    }
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "ic"
-  }, "\uD83D\uDCB0"), /*#__PURE__*/React.createElement("span", {
-    className: "nm",
-    style: {
-      fontWeight: 'bold'
-    }
-  }, "\uCF54\uC778"), /*#__PURE__*/React.createElement("input", {
-    className: "trade-input",
-    type: "number",
-    min: "0",
-    value: ri.tradeOut.coins,
-    onChange: function onChange(e) {
-      return setRi(function (r) {
-        return _objectSpread(_objectSpread({}, r), {}, {
-          tradeOut: _objectSpread(_objectSpread({}, r.tradeOut), {}, {
-            coins: parseInt(e.target.value) || 0
-          })
-        });
-      });
-    }
-  })))), /*#__PURE__*/React.createElement("button", {
-    onClick: function onClick() {
-      return setShowConfirm(true);
-    },
-    disabled: settleDisabled,
-    className: "settle-btn"
-  }, saving ? '⏳ 저장 중...' : settleDisabled ? '😢 코인이 부족해요!' : "\u2705 \uB77C\uC6B4\uB4DC ".concat(gameState.round, " \uC815\uC0B0 \uD655\uC815\uD558\uAE30")), coinAfterSettle < 0 && /*#__PURE__*/React.createElement("p", {
-    style: {
-      fontFamily: 'Gaegu',
-      fontSize: 16,
-      color: 'var(--berry-deep)',
-      textAlign: 'center',
-      marginTop: 10
-    }
-  }, "\uAC74\uC124\uC744 \uC904\uC774\uAC70\uB098, \uC790\uC6D0\uC744 \uD314\uC544 \uCF54\uC778\uC744 \uB354 \uBC8C\uC5B4\uC640\uC57C \uD574\uC694.")), showConfirm && /*#__PURE__*/React.createElement("div", {
-    className: "modal-bg"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "modal"
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 56,
-      marginBottom: 6
-    }
-  }, "\uD83D\uDCDC"), /*#__PURE__*/React.createElement("h3", {
-    style: {
-      fontFamily: 'Jua',
-      fontSize: 26,
-      margin: '0 0 10px',
-      color: 'var(--ink)'
-    }
-  }, "\uC815\uC0B0 \uD655\uC778"), /*#__PURE__*/React.createElement("p", {
-    style: {
-      fontFamily: 'Gaegu',
-      fontSize: 17,
-      color: 'var(--ink-soft)',
-      margin: '0 0 8px',
-      lineHeight: 1.4
-    }
-  }, "\uC785\uB825\uD55C \uB370\uC774\uD130\uB85C \uC790\uC6D0\uC744 \uACC4\uC0B0\uD558\uACE0", /*#__PURE__*/React.createElement("br", null), "\uB77C\uC6B4\uB4DC\uB97C \uB9C8\uCE69\uB2C8\uB2E4."), /*#__PURE__*/React.createElement("p", {
-    style: {
-      fontFamily: 'Gaegu',
-      fontSize: 15,
-      color: '#4F8A2E',
-      margin: '0 0 22px'
-    }
-  }, "\uD83D\uDD25 \uC120\uC0DD\uB2D8 \uD654\uBA74\uC5D0 \uC790\uB3D9\uC73C\uB85C \uBC18\uC601\uB429\uB2C8\uB2E4!"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: 'flex',
-      gap: 12
-    }
-  }, /*#__PURE__*/React.createElement("button", {
-    onClick: function onClick() {
-      return setShowConfirm(false);
-    },
-    className: "btn3d muted",
-    style: {
-      flex: 1,
-      fontSize: 18
-    }
-  }, "\uCDE8\uC18C"), /*#__PURE__*/React.createElement("button", {
-    onClick: executeApply,
-    className: "btn3d green",
-    style: {
-      flex: 1,
-      fontSize: 18
-    }
-  }, "\u2713 \uD655\uC815")))));
+    style: { fontSize: 60, marginBottom: 10 }
+  }, "\uD83D\uDEA8"), /*#__PURE__*/React.createElement("h2", {
+    style: { fontFamily: 'Jua', fontSize: 28, color: '#B83C30', margin: '0 0 10px' }
+  }, "\uAE34\uAE09 \uC18D\uBCF4"), /*#__PURE__*/React.createElement("div", {
+    style: { background: '#FBE0DC', borderRadius: '12px', padding: '12px', marginBottom: '16px' }
+  }, /*#__PURE__*/React.createElement("h3", {
+    style: { fontFamily: 'Jua', fontSize: 20, color: '#A6362A', margin: '0 0 6px' }
+  }, ROUND_EVENTS[String(gameState.round)].name), /*#__PURE__*/React.createElement("p", {
+    style: { fontFamily: 'Gaegu', fontSize: 17, color: '#5A3A22', lineHeight: 1.4, margin: 0 }
+  }, ROUND_EVENTS[String(gameState.round)].desc)), /*#__PURE__*/React.createElement("button", {
+    onClick: handleApplyEvent,
+    className: "btn3d red",
+    style: { width: '100%', fontSize: 20 }
+  }, "\u26A1 \uD655\uC778\uD558\uACE0 \uB77C\uC6B4\uB4DC \uC2DC\uC791"))),
+  
+  /*#__PURE__*/React.createElement("div", { className: "hud" },
+    /*#__PURE__*/React.createElement("div", { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: 720, margin: '0 auto', padding: '14px 18px', gap: 10, flexWrap: 'wrap' } },
+      /*#__PURE__*/React.createElement("button", { onClick: function onClick() { return setMode('start'); }, className: "pill" }, "\u2190 \uBA54\uC778"),
+      /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 8 } },
+        /*#__PURE__*/React.createElement("span", { style: { fontSize: 24 } }, theme.roof),
+        /*#__PURE__*/React.createElement("span", { style: { fontFamily: 'Jua', fontSize: 22, color: 'var(--ink)' } }, group.name),
+        /*#__PURE__*/React.createElement("span", { className: "ribbon", style: { fontSize: 13, padding: '4px 14px' } }, "R", gameState.round)),
+      /*#__PURE__*/React.createElement("div", { style: { display: 'flex', gap: 8 } },
+        /*#__PURE__*/React.createElement("span", { className: "coin-pill" }, "\uD83D\uDCB0 ", group.coins),
+        /*#__PURE__*/React.createElement("span", { className: "heart-pill" }, "\uD83D\uDC9A ", happiness)))),
+  /*#__PURE__*/React.createElement("div", { style: { maxWidth: 720, margin: '0 auto', padding: '24px 18px' } },
+    /*#__PURE__*/React.createElement("div", { className: "bubble banner-econ", style: { marginBottom: 14 } },
+      /*#__PURE__*/React.createElement("div", { style: { fontFamily: 'Jua', fontSize: 16, color: '#5A2D8A' } }, "\uD83C\uDFDB\uFE0F \uAE30\uBCF8 \uACBD\uC81C \u2014 \uC815\uC0B0 \uC2DC ", /*#__PURE__*/React.createElement("b", { style: { color: 'var(--leaf-deep)' } }, "+5 \uCF54\uC778"), " \uB4E4\uC5B4\uC624\uACE0, ", /*#__PURE__*/React.createElement("b", { style: { color: 'var(--berry-deep)' } }, "\uC300 2\uAC1C"), " \uC18C\uBE44!")),
+    /*#__PURE__*/React.createElement("div", { className: "bubble banner-info-blue", style: { marginBottom: 24 } },
+      /*#__PURE__*/React.createElement("div", { style: { fontFamily: 'Gaegu', fontSize: 17, color: 'var(--in-ink)' } }, "\uD83D\uDCA1 ", /*#__PURE__*/React.createElement("b", null, "\uAFC0\uD301!"), " \uCF54\uC778\uC774 \uBD80\uC871\uD560 \uB550 \uC6B0\uB9AC \uB9C8\uC744\uC758 ", /*#__PURE__*/React.createElement("b", null, "\uB0A8\uB294 \uC790\uC6D0\uC744 \uC774\uC6C3 \uB9C8\uC744\uC5D0 \uD314\uC544\uC11C"), " \uCF54\uC778\uC744 \uBC8C\uC5B4\uBCF4\uC138\uC694!")),
+    /*#__PURE__*/React.createElement(SectionTitle, { icon: "\u2728", text: "\uC790\uC6D0 \uC989\uC2DC \uC0AC\uC6A9\uD558\uAE30", sub: "(\uC218\uC694 \uCC3D\uCD9C)", accent: "#4F8A2E" }),
+    /*#__PURE__*/React.createElement("div", { style: { display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 28 } },
+      /*#__PURE__*/React.createElement(UseResourceCard, { available: (group.resources.medical || 0) >= 1, theme: { '--c-bg-1': '#FFFFFF', '--c-bg-2': '#DBEEFF', '--c-border': '#7DB7E8', '--c-shadow': '#7DB7E8', '--c-ink': '#1A4F7A' }, emoji: "\uD83C\uDFE5", label: "\uC758\uB8CC \uC4F0\uAE30", effect: "\uD589\uBCF5 +5", stock: group.resources.medical || 0, onClick: function onClick() { return handleUseResource('medical'); } }),
+      /*#__PURE__*/React.createElement(UseResourceCard, { available: (group.resources.culture || 0) >= 1, theme: { '--c-bg-1': '#FFFFFF', '--c-bg-2': '#F1E2FA', '--c-border': '#C8A0E6', '--c-shadow': '#C8A0E6', '--c-ink': '#5A2D8A' }, emoji: "\uD83C\uDFAD", label: "\uBB38\uD654 \uC4F0\uAE30", effect: "\uD589\uBCF5 +3", stock: group.resources.culture || 0, onClick: function onClick() { return handleUseResource('culture'); } }),
+      /*#__PURE__*/React.createElement(UseResourceCard, { available: (group.resources.product || 0) >= 1, theme: { '--c-bg-1': '#FFFFFF', '--c-bg-2': '#FFF1B5', '--c-border': '#F2C260', '--c-shadow': '#F2C260', '--c-ink': '#7A4D0C' }, emoji: "\uD83C\uDFED", label: "\uC81C\uD488 \uC218\uCD9C", effect: "\uCF54\uC778 +2", stock: group.resources.product || 0, onClick: function onClick() { return handleUseResource('product'); } })),
+    /*#__PURE__*/React.createElement("div", { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 28 } },
+      /*#__PURE__*/React.createElement("div", { className: "plate-soft", style: { padding: 16 } },
+        /*#__PURE__*/React.createElement("div", { style: { fontFamily: 'Jua', fontSize: 16, color: 'var(--wood-deep)', marginBottom: 10 } }, "\uD83D\uDCE6 \uBCF4\uC720 \uC790\uC6D0"),
+        /*#__PURE__*/React.createElement("div", { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 } }, Object.entries(RESOURCES).map(function (_ref16) {
+          var _ref17 = _slicedToArray(_ref16, 2), id = _ref17[0], r = _ref17[1];
+          return /*#__PURE__*/React.createElement("div", { key: id, className: "chip", style: { padding: '6px 10px' } }, /*#__PURE__*/React.createElement("span", { className: "ic" }, r.icon), /*#__PURE__*/React.createElement("span", { style: { fontSize: 13 } }, r.name), /*#__PURE__*/React.createElement("span", { className: "num" }, group.resources[id] || 0));
+        }))),
+      /*#__PURE__*/React.createElement("div", { className: "plate-soft", style: { padding: 16 } },
+        /*#__PURE__*/React.createElement("div", { style: { fontFamily: 'Jua', fontSize: 16, color: 'var(--wood-deep)', marginBottom: 10 } }, "\uD83C\uDFD7\uFE0F \uBCF4\uC720 \uC2DC\uC124"),
+        /*#__PURE__*/React.createElement("div", { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 } }, Object.entries(FACILITIES).map(function (_ref18) {
+          var _ref19 = _slicedToArray(_ref18, 2), id = _ref19[0], f = _ref19[1];
+          return /*#__PURE__*/React.createElement("div", { key: id, className: "chip", style: { padding: '6px 10px' } }, /*#__PURE__*/React.createElement("span", { className: "ic" }, f.icon), /*#__PURE__*/React.createElement("span", { style: { fontSize: 13 } }, f.name), /*#__PURE__*/React.createElement("span", { className: "num" }, group.facilities[id] || 0));
+        })))),
+    /*#__PURE__*/React.createElement(SectionTitle, { icon: "\uD83E\uDDF1", text: "\uC2DC\uC124 \uAC74\uC124", sub: "\uB0A8\uC740 \uCF54\uC778: ".concat(coinAfterSettle), accent: "var(--wood-deep)" }),
+    /*#__PURE__*/React.createElement("div", { className: "plate-soft", style: { padding: 16, marginBottom: 28 } },
+      /*#__PURE__*/React.createElement("div", { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 } }, Object.entries(FACILITIES).map(function (_ref20) {
+        var _ref21 = _slicedToArray(_ref20, 2), id = _ref21[0], f = _ref21[1];
+        return /*#__PURE__*/React.createElement("div", { key: id, className: "fac-row" }, /*#__PURE__*/React.createElement("div", { className: "ic" }, f.icon), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", { className: "nm" }, f.name), /*#__PURE__*/React.createElement("div", { className: "cost" }, "\uD83D\uDCB0 ", f.cost)), /*#__PURE__*/React.createElement("div", { className: "ctr" }, /*#__PURE__*/React.createElement("button", { className: "qbtn minus", disabled: ri.bought[id] === 0, onClick: function onClick() { return setRi(function (r) { return _objectSpread(_objectSpread({}, r), {}, { bought: _objectSpread(_objectSpread({}, r.bought), {}, _defineProperty({}, id, Math.max(0, r.bought[id] - 1))) }); }); } }, "\u2212"), /*#__PURE__*/React.createElement("span", { className: "num" }, ri.bought[id]), /*#__PURE__*/React.createElement("button", { className: "qbtn plus", onClick: function onClick() { return setRi(function (r) { return _objectSpread(_objectSpread({}, r), {}, { bought: _objectSpread(_objectSpread({}, r.bought), {}, _defineProperty({}, id, r.bought[id] + 1)) }); }); } }, "+")));
+      })),
+      /*#__PURE__*/React.createElement("div", { style: { marginTop: 14, padding: '10px 14px', background: '#FFF8E0', borderRadius: 14, border: '2px dashed #F2C260', fontFamily: 'Gaegu', fontSize: 16, color: '#7A4D0C', textAlign: 'center' } }, "\uD83D\uDD28 \uAC74\uC124\uBE44 \uD569\uACC4 : ", /*#__PURE__*/React.createElement("b", null, buildCost), " \uCF54\uC778")),
+    /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 } },
+      /*#__PURE__*/React.createElement(SectionTitle, { icon: "\uD83E\uDD1D", text: "\uAD50\uB958 \uD611\uC0C1 \uACB0\uACFC", accent: "var(--ocean-deep)", inline: true }),
+      /*#__PURE__*/React.createElement("span", { className: "tag-num" }, "\uD604\uC7AC \uAD50\uB958 \uD69F\uC218: ", group.tradeCount || 0, "\uD68C")),
+    /*#__PURE__*/React.createElement("div", { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 28 } },
+      /*#__PURE__*/React.createElement("div", { className: "trade-panel in" },
+        /*#__PURE__*/React.createElement("div", { style: { fontFamily: 'Jua', fontSize: 16, color: 'var(--in-ink)', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 } }, /*#__PURE__*/React.createElement("span", { style: { background: 'var(--in-ink)', color: 'white', borderRadius: 999, width: 22, height: 22, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 } }, "+"), "\uBC1B\uC740 \uC790\uC6D0 / \uCF54\uC778"), Object.keys(RESOURCES).map(function (id) {
+          return /*#__PURE__*/React.createElement("div", { key: id, className: "trade-row" }, /*#__PURE__*/React.createElement("span", { className: "ic" }, RESOURCES[id].icon), /*#__PURE__*/React.createElement("span", { className: "nm" }, RESOURCES[id].name), /*#__PURE__*/React.createElement("input", { className: "trade-input", type: "number", min: "0", value: ri.tradeIn[id], onChange: function onChange(e) { return setRi(function (r) { return _objectSpread(_objectSpread({}, r), {}, { tradeIn: _objectSpread(_objectSpread({}, r.tradeIn), {}, _defineProperty({}, id, parseInt(e.target.value) || 0)) }); }); } }));
+        }),
+        /*#__PURE__*/React.createElement("div", { className: "trade-row", style: { marginTop: 6, background: 'rgba(255,255,255,0.6)', borderRadius: 12 } }, /*#__PURE__*/React.createElement("span", { className: "ic" }, "\uD83D\uDCB0"), /*#__PURE__*/React.createElement("span", { className: "nm", style: { fontWeight: 'bold' } }, "\uCF54\uC778"), /*#__PURE__*/React.createElement("input", { className: "trade-input", type: "number", min: "0", value: ri.tradeIn.coins, onChange: function onChange(e) { return setRi(function (r) { return _objectSpread(_objectSpread({}, r), {}, { tradeIn: _objectSpread(_objectSpread({}, r.tradeIn), {}, { coins: parseInt(e.target.value) || 0 }) }); }); } }))),
+      /*#__PURE__*/React.createElement("div", { className: "trade-panel out" },
+        /*#__PURE__*/React.createElement("div", { style: { fontFamily: 'Jua', fontSize: 16, color: 'var(--out-ink)', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 } }, /*#__PURE__*/React.createElement("span", { style: { background: 'var(--out-ink)', color: 'white', borderRadius: 999, width: 22, height: 22, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 } }, "\u2212"), "\uC900 \uC790\uC6D0 / \uCF54\uC778"), Object.keys(RESOURCES).map(function (id) {
+          return /*#__PURE__*/React.createElement("div", { key: id, className: "trade-row" }, /*#__PURE__*/React.createElement("span", { className: "ic" }, RESOURCES[id].icon), /*#__PURE__*/React.createElement("span", { className: "nm" }, RESOURCES[id].name), /*#__PURE__*/React.createElement("input", { className: "trade-input", type: "number", min: "0", value: ri.tradeOut[id], onChange: function onChange(e) { return setRi(function (r) { return _objectSpread(_objectSpread({}, r), {}, { tradeOut: _objectSpread(_objectSpread({}, r.tradeOut), {}, _defineProperty({}, id, parseInt(e.target.value) || 0)) }); }); } }));
+        }),
+        /*#__PURE__*/React.createElement("div", { className: "trade-row", style: { marginTop: 6, background: 'rgba(255,255,255,0.6)', borderRadius: 12 } }, /*#__PURE__*/React.createElement("span", { className: "ic" }, "\uD83D\uDCB0"), /*#__PURE__*/React.createElement("span", { className: "nm", style: { fontWeight: 'bold' } }, "\uCF54\uC778"), /*#__PURE__*/React.createElement("input", { className: "trade-input", type: "number", min: "0", value: ri.tradeOut.coins, onChange: function onChange(e) { return setRi(function (r) { return _objectSpread(_objectSpread({}, r), {}, { tradeOut: _objectSpread(_objectSpread({}, r.tradeOut), {}, { coins: parseInt(e.target.value) || 0 }) }); }); } })))),
+    /*#__PURE__*/React.createElement("button", { onClick: function onClick() { return setShowConfirm(true); }, disabled: settleDisabled, className: "settle-btn" }, saving ? '⏳ 저장 중...' : needsEventPopup ? '⚡ 속보를 먼저 확인해주세요!' : settleDisabled ? '😢 코인이 부족해요!' : "\u2705 \uB77C\uC6B4\uB4DC ".concat(gameState.round, " \uC815\uC0B0 \uD655\uC815\uD558\uAE30")),
+    coinAfterSettle < 0 && /*#__PURE__*/React.createElement("p", { style: { fontFamily: 'Gaegu', fontSize: 16, color: 'var(--berry-deep)', textAlign: 'center', marginTop: 10 } }, "\uAC74\uC124\uC744 \uC904\uC774\uAC70\uB098, \uC790\uC6D0\uC744 \uD314\uC544 \uCF54\uC778\uC744 \uB354 \uBC8C\uC5B4\uC640\uC57C \uD574\uC694.")),
+  showConfirm && /*#__PURE__*/React.createElement("div", { className: "modal-bg" },
+    /*#__PURE__*/React.createElement("div", { className: "modal" },
+      /*#__PURE__*/React.createElement("div", { style: { fontSize: 56, marginBottom: 6 } }, "\uD83D\uDCDC"),
+      /*#__PURE__*/React.createElement("h3", { style: { fontFamily: 'Jua', fontSize: 26, margin: '0 0 10px', color: 'var(--ink)' } }, "\uC815\uC0B0 \uD655\uC778"),
+      /*#__PURE__*/React.createElement("p", { style: { fontFamily: 'Gaegu', fontSize: 17, color: 'var(--ink-soft)', margin: '0 0 8px', lineHeight: 1.4 } }, "\uC785\uB825\uD55C \uB370\uC774\uD130\uB85C \uC790\uC6D0\uC744 \uACC4\uC0B0\uD558\uACE0", /*#__PURE__*/React.createElement("br", null), "\uB77C\uC6B4\uB4DC\uB97C \uB9C8\uCE69\uB2C8\uB2E4."),
+      /*#__PURE__*/React.createElement("p", { style: { fontFamily: 'Gaegu', fontSize: 15, color: '#4F8A2E', margin: '0 0 22px' } }, "\uD83D\uDD25 \uC120\uC0DD\uB2D8 \uD654\uBA74\uC5D0 \uC790\uB3D9\uC73C\uB85C \uBC18\uC601\uB429\uB2C8\uB2E4!"),
+      /*#__PURE__*/React.createElement("div", { style: { display: 'flex', gap: 12 } },
+        /*#__PURE__*/React.createElement("button", { onClick: function onClick() { return setShowConfirm(false); }, className: "btn3d muted", style: { flex: 1, fontSize: 18 } }, "\uCDE8\uC18C"),
+        /*#__PURE__*/React.createElement("button", { onClick: executeApply, className: "btn3d green", style: { flex: 1, fontSize: 18 } }, "\u2713 \uD655\uC815")))));
 }
 
 // ─────────────────────────────────────────────────────────────
 //  교사 대시보드 — 실시간 자동 갱신
 // ─────────────────────────────────────────────────────────────
 function TeacherBoard(_ref22) {
-  var gameState = _ref22.gameState,
-    saveState = _ref22.saveState,
-    resetState = _ref22.resetState,
-    setMode = _ref22.setMode;
-  var round = gameState.round,
-    groups = gameState.groups || {};
-  var _useState19 = useState(false),
-    _useState20 = _slicedToArray(_useState19, 2),
-    showResetConfirm = _useState20[0],
-    setShowResetConfirm = _useState20[1];
-  var _useState21 = useState(new Date()),
-    _useState22 = _slicedToArray(_useState21, 2),
-    lastUpdate = _useState22[0],
-    setLastUpdate = _useState22[1];
-  var _useState23 = useState(null),
-    _useState24 = _slicedToArray(_useState23, 2),
-    flashGroup = _useState24[0],
-    setFlashGroup = _useState24[1];
+  var gameState = _ref22.gameState, saveState = _ref22.saveState, resetState = _ref22.resetState, setMode = _ref22.setMode;
+  var round = gameState.round, groups = gameState.groups || {};
+  var _useState19 = useState(false), _useState20 = _slicedToArray(_useState19, 2), showResetConfirm = _useState20[0], setShowResetConfirm = _useState20[1];
+  var _useState21 = useState(new Date()), _useState22 = _slicedToArray(_useState21, 2), lastUpdate = _useState22[0], setLastUpdate = _useState22[1];
+  var _useState23 = useState(null), _useState24 = _slicedToArray(_useState23, 2), flashGroup = _useState24[0], setFlashGroup = _useState24[1];
   var prevGroupsRef = useRef(groups);
 
-  // 새 모둠 데이터 감지 → 플래시 효과
   useEffect(function () {
     var prev = prevGroupsRef.current;
     for (var n = 1; n <= 4; n++) {
@@ -2578,331 +1578,71 @@ function TeacherBoard(_ref22) {
       if (currG && (!prevG || prevG.lastSubmittedRound !== currG.lastSubmittedRound)) {
         setFlashGroup(n);
         setLastUpdate(new Date());
-        setTimeout(function () {
-          return setFlashGroup(null);
-        }, 2000);
+        setTimeout(function () { return setFlashGroup(null); }, 2000);
       }
     }
     prevGroupsRef.current = groups;
   }, [groups]);
-  var handleRoundChange = function handleRoundChange(newRound) {
-    saveState(_objectSpread(_objectSpread({}, gameState), {}, {
-      round: newRound
-    }));
-  };
-  return /*#__PURE__*/React.createElement("div", {
-    className: "tv-bg tv-fullscreen"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "tv-header"
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: 14
-    }
-  }, /*#__PURE__*/React.createElement("span", {
-    style: {
-      fontSize: 36
-    }
-  }, "\uD83D\uDCFA"), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
-    className: "neon-title",
-    style: {
-      margin: 0,
-      fontSize: 32
-    }
-  }, "\uB9C8\uC744 \uACBD\uC81C \uD1B5\uD569 \uB300\uC2DC\uBCF4\uB4DC"), /*#__PURE__*/React.createElement("p", {
-    className: "neon-subtle",
-    style: {
-      margin: '2px 0 0',
-      fontSize: 15
-    }
-  }, "\u25B8 ", ROUND_LABELS[String(round)], " \uC9C4\uD589 \uC911 \xA0\xB7\xA0", /*#__PURE__*/React.createElement("span", {
-    style: {
-      color: '#6CFFB1',
-      fontSize: 13
-    }
-  }, "\uD83D\uDD25 \uC2E4\uC2DC\uAC04 \uC5F0\uB3D9 \xB7 \uB9C8\uC9C0\uB9C9 \uAC31\uC2E0 ", lastUpdate.toLocaleTimeString('ko-KR'))))), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: 'flex',
-      gap: 10,
-      flexWrap: 'wrap'
-    }
-  }, /*#__PURE__*/React.createElement("button", {
-    onClick: function onClick() {
-      return handleRoundChange(Math.max(1, round - 1));
-    },
-    className: "tv-btn"
-  }, "\u25C0 \uC774\uC804"), /*#__PURE__*/React.createElement("button", {
-    onClick: function onClick() {
-      return handleRoundChange(Math.min(8, round + 1));
-    },
-    className: "tv-btn primary"
-  }, "\uB2E4\uC74C \uB77C\uC6B4\uB4DC \u25B6"), /*#__PURE__*/React.createElement("button", {
-    onClick: function onClick() {
-      return setMode('start');
-    },
-    className: "tv-btn ghost"
-  }, "\uC785\uB825 \uD654\uBA74\uC73C\uB85C"), /*#__PURE__*/React.createElement("button", {
-    onClick: function onClick() {
-      return setShowResetConfirm(true);
-    },
-    className: "tv-btn danger",
-    title: "\uB370\uC774\uD130 \uC804\uCCB4 \uCD08\uAE30\uD654"
-  }, "\u26A0\uFE0F"))), /*#__PURE__*/React.createElement("div", {
-    className: "tv-grid"
-  }, [1, 2, 3, 4].map(function (n) {
-    var g = groups[String(n)];
-    var isFlashing = flashGroup === n;
-    if (!g) {
-      return /*#__PURE__*/React.createElement("div", {
-        key: n,
-        className: "tv-empty-big"
-      }, /*#__PURE__*/React.createElement("div", {
-        className: "e"
-      }, "\uD83C\uDFDA\uFE0F"), /*#__PURE__*/React.createElement("div", null, n, "\uBAA8\uB460 \xB7 \uB300\uAE30 \uC911"), /*#__PURE__*/React.createElement("div", {
-        style: {
-          fontSize: 13,
-          opacity: 0.6,
-          fontFamily: 'Jua'
-        }
-      }, "\uD559\uC0DD\uC774 \uC785\uB825\uD558\uBA74 \uC790\uB3D9\uC73C\uB85C \uB098\uD0C0\uB098\uC694"));
-    }
-    var isDone = g.lastSubmittedRound === round;
-    var happy = calcHappiness(g.happyBase, g.facilities);
-    var happyColor = happy >= 70 ? 'var(--neon-green)' : happy >= 40 ? 'var(--neon-orange)' : '#FF6B6B';
-    var happyShadow = happy >= 70 ? 'rgba(108,255,177,0.7)' : happy >= 40 ? 'rgba(255,169,77,0.7)' : 'rgba(255,107,107,0.7)';
-    return /*#__PURE__*/React.createElement("div", {
-      key: n,
-      className: "tv-card-big tv-".concat(n, " ").concat(isDone ? 'done' : ''),
-      style: isFlashing ? {
-        boxShadow: '0 0 40px rgba(108,255,177,0.8)',
-        border: '2px solid rgba(108,255,177,1)',
-        transition: 'all 0.3s'
-      } : {}
-    }, isFlashing && /*#__PURE__*/React.createElement("div", {
-      style: {
-        position: 'absolute',
-        top: 8,
-        right: 12,
-        background: '#6CFFB1',
-        color: '#0E1B3D',
-        borderRadius: 999,
-        padding: '3px 12px',
-        fontFamily: 'Jua',
-        fontSize: 13,
-        zIndex: 10
+  var handleRoundChange = function handleRoundChange(newRound) { saveState(_objectSpread(_objectSpread({}, gameState), {}, { round: newRound })); };
+  return /*#__PURE__*/React.createElement("div", { className: "tv-bg tv-fullscreen" },
+    /*#__PURE__*/React.createElement("div", { className: "tv-header" },
+      /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 14 } },
+        /*#__PURE__*/React.createElement("span", { style: { fontSize: 36 } }, "\uD83D\uDCFA"),
+        /*#__PURE__*/React.createElement("div", null,
+          /*#__PURE__*/React.createElement("h1", { className: "neon-title", style: { margin: 0, fontSize: 32 } }, "\uB9C8\uC744 \uACBD\uC81C \uD1B5\uD569 \uB300\uC2DC\uBCF4\uB4DC"),
+          /*#__PURE__*/React.createElement("p", { className: "neon-subtle", style: { margin: '2px 0 0', fontSize: 15 } }, "\u25B8 ", ROUND_LABELS[String(round)], " \uC9C4\uD589 \uC911 \xA0\xB7\xA0", /*#__PURE__*/React.createElement("span", { style: { color: '#6CFFB1', fontSize: 13 } }, "\uD83D\uDD25 \uC2E4\uC2DC\uAC04 \uC5F0\uB3D9 \xB7 \uB9C8\uC9C0\uB9C9 \uAC31\uC2E0 ", lastUpdate.toLocaleTimeString('ko-KR'))))),
+      /*#__PURE__*/React.createElement("div", { style: { display: 'flex', gap: 10, flexWrap: 'wrap' } },
+        /*#__PURE__*/React.createElement("button", { onClick: function onClick() { return handleRoundChange(Math.max(1, round - 1)); }, className: "tv-btn" }, "\u25C0 \uC774\uC804"),
+        /*#__PURE__*/React.createElement("button", { onClick: function onClick() { return handleRoundChange(Math.min(8, round + 1)); }, className: "tv-btn primary" }, "\uB2E4\uC74C \uB77C\uC6B4\uB4DC \u25B6"),
+        /*#__PURE__*/React.createElement("button", { onClick: function onClick() { return setMode('start'); }, className: "tv-btn ghost" }, "\uC785\uB825 \uD654\uBA74\uC73C\uB85C"),
+        /*#__PURE__*/React.createElement("button", { onClick: function onClick() { return setShowResetConfirm(true); }, className: "tv-btn danger", title: "\uB370\uC774\uD130 \uC804\uCCB4 \uCD08\uAE30\uD654" }, "\u26A0\uFE0F"))),
+    /*#__PURE__*/React.createElement("div", { className: "tv-grid" }, [1, 2, 3, 4].map(function (n) {
+      var g = groups[String(n)];
+      var isFlashing = flashGroup === n;
+      if (!g) {
+        return /*#__PURE__*/React.createElement("div", { key: n, className: "tv-empty-big" }, /*#__PURE__*/React.createElement("div", { className: "e" }, "\uD83C\uDFDA\uFE0F"), /*#__PURE__*/React.createElement("div", null, n, "\uBAA8\uB460 \xB7 \uB300\uAE30 \uC911"), /*#__PURE__*/React.createElement("div", { style: { fontSize: 13, opacity: 0.6, fontFamily: 'Jua' } }, "\uD559\uC0DD\uC774 \uC785\uB825\uD558\uBA74 \uC790\uB3D9\uC73C\uB85C \uB098\uD0C0\uB098\uC694"));
       }
-    }, "\uD83D\uDD25 \uBC29\uAE08 \uAC31\uC2E0\uB428!"), /*#__PURE__*/React.createElement("div", {
-      className: "group-tag"
-    }, n, "\uBAA8\uB460", isDone && /*#__PURE__*/React.createElement("span", {style:{marginLeft:5,fontSize:'0.85em'}}, " ✓")), /*#__PURE__*/React.createElement("div", {
-      className: "tv-card-head"
-    }, /*#__PURE__*/React.createElement("h3", null, VILLAGE_THEME[String(n)].roof, " ", g.name), /*#__PURE__*/React.createElement("span", {
-      className: "trade-tag"
-    }, "\uD83E\uDD1D \uAD50\uB958 ", g.tradeCount || 0, "\uD68C")), /*#__PURE__*/React.createElement("div", {
-      className: "tv-stats-row"
-    }, /*#__PURE__*/React.createElement("div", {
-      className: "tv-stat-big"
-    }, /*#__PURE__*/React.createElement("div", {
-      className: "lbl"
-    }, "\uD589\uBCF5\uC9C0\uC218"), /*#__PURE__*/React.createElement("div", {
-      className: "val",
-      style: {
-        color: happyColor,
-        textShadow: "0 0 18px ".concat(happyShadow)
-      }
-    }, happy)), /*#__PURE__*/React.createElement("div", {
-      className: "tv-stat-big"
-    }, /*#__PURE__*/React.createElement("div", {
-      className: "lbl"
-    }, "\uCF54\uC778"), /*#__PURE__*/React.createElement("div", {
-      className: "val",
-      style: {
-        color: 'var(--neon-yellow)',
-        textShadow: '0 0 18px rgba(255,228,94,0.6)'
-      }
-    }, "\uD83D\uDCB0", g.coins))), /*#__PURE__*/React.createElement("div", {
-      className: "tv-resources-big"
-    }, Object.entries(RESOURCES).map(function (_ref23) {
-      var _ref24 = _slicedToArray(_ref23, 2),
-        id = _ref24[0],
-        r = _ref24[1];
-      var v = g.resources[id] || 0;
-      var warn = id === 'rice' && v <= 0;
-      return /*#__PURE__*/React.createElement("div", {
-        key: id,
-        className: "tv-resource-big ".concat(warn ? 'warn' : '')
-      }, /*#__PURE__*/React.createElement("div", {
-        className: "ic"
-      }, r.icon), /*#__PURE__*/React.createElement("div", {
-        className: "v"
-      }, v), /*#__PURE__*/React.createElement("div", {
-        className: "nm"
-      }, r.name));
-    })));
-  })), /*#__PURE__*/React.createElement("div", {
-    className: "tv-footer"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "tv-footer-q"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "lbl"
-  }, "\u25B8 \uD575\uC2EC \uC9C8\uBB38"), /*#__PURE__*/React.createElement("p", null, "Q. ", ROUND_QUESTIONS[String(round)])), ROUND_EVENTS[String(round)] && /*#__PURE__*/React.createElement("div", {
-    className: "tv-footer-e"
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 32
-    }
-  }, "\uD83D\uDCE2"), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
-    className: "ev-name"
-  }, ROUND_EVENTS[String(round)].name), /*#__PURE__*/React.createElement("div", {
-    className: "ev-desc"
-  }, ROUND_EVENTS[String(round)].desc)))), showResetConfirm && /*#__PURE__*/React.createElement("div", {
-    className: "modal-bg"
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      background: 'linear-gradient(180deg, #1A2B5E, #0E1B3D)',
-      border: '2px solid rgba(255,107,107,0.5)',
-      boxShadow: '0 0 40px rgba(255,107,107,0.3)',
-      borderRadius: 24,
-      padding: 36,
-      maxWidth: 420,
-      textAlign: 'center'
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 56,
-      marginBottom: 8
-    }
-  }, "\u26A0\uFE0F"), /*#__PURE__*/React.createElement("h2", {
-    style: {
-      color: 'white',
-      fontFamily: 'Jua',
-      fontSize: 26,
-      margin: '0 0 10px'
-    }
-  }, "\uC804\uCCB4 \uCD08\uAE30\uD654"), /*#__PURE__*/React.createElement("p", {
-    style: {
-      color: 'rgba(255,255,255,0.7)',
-      fontFamily: 'Gaegu',
-      fontSize: 17,
-      marginBottom: 26,
-      lineHeight: 1.4
-    }
-  }, "Firebase\uC758 \uBAA8\uB4E0 \uBAA8\uB460 \uB370\uC774\uD130\uAC00", /*#__PURE__*/React.createElement("br", null), "\uC601\uAD6C\uC801\uC73C\uB85C \uC0AD\uC81C\uB429\uB2C8\uB2E4.", /*#__PURE__*/React.createElement("br", null), "\uACC4\uC18D\uD558\uC2DC\uACA0\uC2B5\uB2C8\uAE4C?"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: 'flex',
-      gap: 12
-    }
-  }, /*#__PURE__*/React.createElement("button", {
-    onClick: function onClick() {
-      return setShowResetConfirm(false);
-    },
-    style: {
-      flex: 1,
-      padding: 14,
-      borderRadius: 14,
-      border: '1px solid rgba(255,255,255,0.2)',
-      background: 'rgba(255,255,255,0.08)',
-      color: 'white',
-      fontFamily: 'Jua',
-      fontSize: 16,
-      cursor: 'pointer'
-    }
-  }, "\uCDE8\uC18C"), /*#__PURE__*/React.createElement("button", {
-    onClick: function onClick() {
-      resetState();
-      setShowResetConfirm(false);
-    },
-    style: {
-      flex: 1,
-      padding: 14,
-      borderRadius: 14,
-      border: '2px solid #B83C30',
-      background: 'linear-gradient(180deg, #F4978E, #E8645A)',
-      color: 'white',
-      fontFamily: 'Jua',
-      fontSize: 16,
-      cursor: 'pointer'
-    }
-  }, "\uCD08\uAE30\uD654")))));
+      var isDone = g.lastSubmittedRound === round;
+      var happy = calcHappiness(g.happyBase, g.facilities);
+      var happyColor = happy >= 70 ? 'var(--neon-green)' : happy >= 40 ? 'var(--neon-orange)' : '#FF6B6B';
+      var happyShadow = happy >= 70 ? 'rgba(108,255,177,0.7)' : happy >= 40 ? 'rgba(255,169,77,0.7)' : 'rgba(255,107,107,0.7)';
+      return /*#__PURE__*/React.createElement("div", { key: n, className: "tv-card-big tv-".concat(n, " ").concat(isDone ? 'done' : ''), style: isFlashing ? { boxShadow: '0 0 40px rgba(108,255,177,0.8)', border: '2px solid rgba(108,255,177,1)', transition: 'all 0.3s' } : {} },
+        isFlashing && /*#__PURE__*/React.createElement("div", { style: { position: 'absolute', top: 8, right: 12, background: '#6CFFB1', color: '#0E1B3D', borderRadius: 999, padding: '3px 12px', fontFamily: 'Jua', fontSize: 13, zIndex: 10 } }, "\uD83D\uDD25 \uBC29\uAE08 \uAC31\uC2E0\uB428!"),
+        /*#__PURE__*/React.createElement("div", { className: "group-tag" }, n, "\uBAA8\uB460", isDone && /*#__PURE__*/React.createElement("span", { style: { marginLeft: 5, fontSize: '0.85em' } }, " \u2713")),
+        /*#__PURE__*/React.createElement("div", { className: "tv-card-head" }, /*#__PURE__*/React.createElement("h3", null, VILLAGE_THEME[String(n)].roof, " ", g.name), /*#__PURE__*/React.createElement("span", { className: "trade-tag" }, "\uD83E\uDD1D \uAD50\uB958 ", g.tradeCount || 0, "\uD68C")),
+        /*#__PURE__*/React.createElement("div", { className: "tv-stats-row" },
+          /*#__PURE__*/React.createElement("div", { className: "tv-stat-big" }, /*#__PURE__*/React.createElement("div", { className: "lbl" }, "\uD589\uBCF5\uC9C0\uC218"), /*#__PURE__*/React.createElement("div", { className: "val", style: { color: happyColor, textShadow: "0 0 18px ".concat(happyShadow) } }, happy)),
+          /*#__PURE__*/React.createElement("div", { className: "tv-stat-big" }, /*#__PURE__*/React.createElement("div", { className: "lbl" }, "\uCF54\uC778"), /*#__PURE__*/React.createElement("div", { className: "val", style: { color: 'var(--neon-yellow)', textShadow: '0 0 18px rgba(255,228,94,0.6)' } }, "\uD83D\uDCB0", g.coins))),
+        /*#__PURE__*/React.createElement("div", { className: "tv-resources-big" }, Object.entries(RESOURCES).map(function (_ref23) {
+          var _ref24 = _slicedToArray(_ref23, 2), id = _ref24[0], r = _ref24[1];
+          var v = g.resources[id] || 0;
+          var warn = id === 'rice' && v <= 0;
+          return /*#__PURE__*/React.createElement("div", { key: id, className: "tv-resource-big ".concat(warn ? 'warn' : '') }, /*#__PURE__*/React.createElement("div", { className: "ic" }, r.icon), /*#__PURE__*/React.createElement("div", { className: "v" }, v), /*#__PURE__*/React.createElement("div", { className: "nm" }, r.name));
+        })));
+    })),
+    /*#__PURE__*/React.createElement("div", { className: "tv-footer" },
+      /*#__PURE__*/React.createElement("div", { className: "tv-footer-q" }, /*#__PURE__*/React.createElement("div", { className: "lbl" }, "\u25B8 \uD575\uC2EC \uC9C8\uBB38"), /*#__PURE__*/React.createElement("p", null, "Q. ", ROUND_QUESTIONS[String(round)])),
+      ROUND_EVENTS[String(round)] && /*#__PURE__*/React.createElement("div", { className: "tv-footer-e" }, /*#__PURE__*/React.createElement("div", { style: { fontSize: 32 } }, "\uD83D\uDCE2"), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", { className: "ev-name" }, ROUND_EVENTS[String(round)].name), /*#__PURE__*/React.createElement("div", { className: "ev-desc" }, ROUND_EVENTS[String(round)].desc)))),
+    showResetConfirm && /*#__PURE__*/React.createElement("div", { className: "modal-bg" },
+      /*#__PURE__*/React.createElement("div", { style: { background: 'linear-gradient(180deg, #1A2B5E, #0E1B3D)', border: '2px solid rgba(255,107,107,0.5)', boxShadow: '0 0 40px rgba(255,107,107,0.3)', borderRadius: 24, padding: 36, maxWidth: 420, textAlign: 'center' } },
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 56, marginBottom: 8 } }, "\u26A0\uFE0F"),
+        /*#__PURE__*/React.createElement("h2", { style: { color: 'white', fontFamily: 'Jua', fontSize: 26, margin: '0 0 10px' } }, "\uC804\uCCB4 \uCD08\uAE30\uD654"),
+        /*#__PURE__*/React.createElement("p", { style: { color: 'rgba(255,255,255,0.7)', fontFamily: 'Gaegu', fontSize: 17, marginBottom: 26, lineHeight: 1.4 } }, "Firebase\uC758 \uBAA8\uB4E0 \uBAA8\uB460 \uB370\uC774\uD130\uAC00", /*#__PURE__*/React.createElement("br", null), "\uC601\uAD6C\uC801\uC73C\uB85C \uC0AD\uC81C\uB429\uB2C8\uB2E4.", /*#__PURE__*/React.createElement("br", null), "\uACC4\uC18D\uD558\uC2DC\uACA0\uC2B5\uB2C8\uAE4C?"),
+        /*#__PURE__*/React.createElement("div", { style: { display: 'flex', gap: 12 } },
+          /*#__PURE__*/React.createElement("button", { onClick: function onClick() { return setShowResetConfirm(false); }, style: { flex: 1, padding: 14, borderRadius: 14, border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.08)', color: 'white', fontFamily: 'Jua', fontSize: 16, cursor: 'pointer' } }, "\uCDE8\uC18C"),
+          /*#__PURE__*/React.createElement("button", { onClick: function onClick() { resetState(); setShowResetConfirm(false); }, style: { flex: 1, padding: 14, borderRadius: 14, border: '2px solid #B83C30', background: 'linear-gradient(180deg, #F4978E, #E8645A)', color: 'white', fontFamily: 'Jua', fontSize: 16, cursor: 'pointer' } }, "\uCD08\uAE30\uD654")))));
 }
 
 // ─────────────────────────────────────────────────────────────
 //  공통 컴포넌트
 // ─────────────────────────────────────────────────────────────
 function SectionTitle(_ref25) {
-  var icon = _ref25.icon,
-    text = _ref25.text,
-    sub = _ref25.sub,
-    accent = _ref25.accent,
-    inline = _ref25.inline;
-  return /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: 'flex',
-      alignItems: 'baseline',
-      gap: 10,
-      marginBottom: inline ? 0 : 12
-    }
-  }, /*#__PURE__*/React.createElement("span", {
-    style: {
-      fontFamily: 'Jua',
-      fontSize: 22,
-      color: accent || 'var(--ink)'
-    }
-  }, icon, " ", text), sub && /*#__PURE__*/React.createElement("span", {
-    style: {
-      fontFamily: 'Gaegu',
-      fontSize: 15,
-      color: 'var(--ink-soft)'
-    }
-  }, sub));
+  var icon = _ref25.icon, text = _ref25.text, sub = _ref25.sub, accent = _ref25.accent, inline = _ref25.inline;
+  return /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: inline ? 0 : 12 } }, /*#__PURE__*/React.createElement("span", { style: { fontFamily: 'Jua', fontSize: 22, color: accent || 'var(--ink)' } }, icon, " ", text), sub && /*#__PURE__*/React.createElement("span", { style: { fontFamily: 'Gaegu', fontSize: 15, color: 'var(--ink-soft)' } }, sub));
 }
 function UseResourceCard(_ref26) {
-  var emoji = _ref26.emoji,
-    label = _ref26.label,
-    effect = _ref26.effect,
-    stock = _ref26.stock,
-    onClick = _ref26.onClick,
-    available = _ref26.available,
-    theme = _ref26.theme;
-  return /*#__PURE__*/React.createElement("button", {
-    onClick: onClick,
-    disabled: !available,
-    className: "use-card ".concat(available ? 'glint' : ''),
-    style: _objectSpread(_objectSpread({}, theme), {}, {
-      border: 'none',
-      opacity: available ? 1 : 0.55,
-      cursor: available ? 'pointer' : 'not-allowed'
-    })
-  }, available && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("span", {
-    className: "star",
-    style: {
-      top: 6,
-      right: 8,
-      color: '#FFD371'
-    }
-  }, "\u2728"), /*#__PURE__*/React.createElement("span", {
-    className: "star",
-    style: {
-      bottom: 8,
-      left: 8,
-      color: '#FFE45E',
-      animationDelay: '1s'
-    }
-  }, "\u2B50")), /*#__PURE__*/React.createElement("div", {
-    className: "big-emoji"
-  }, emoji), /*#__PURE__*/React.createElement("div", {
-    className: "label"
-  }, label), /*#__PURE__*/React.createElement("div", {
-    className: "effect"
-  }, effect), /*#__PURE__*/React.createElement("div", {
-    style: {
-      marginTop: 6,
-      fontFamily: 'Gaegu',
-      fontSize: 13,
-      color: 'var(--c-ink)',
-      opacity: 0.75
-    }
-  }, "\uBCF4\uC720 ", stock));
+  var emoji = _ref26.emoji, label = _ref26.label, effect = _ref26.effect, stock = _ref26.stock, onClick = _ref26.onClick, available = _ref26.available, theme = _ref26.theme;
+  return /*#__PURE__*/React.createElement("button", { onClick: onClick, disabled: !available, className: "use-card ".concat(available ? 'glint' : ''), style: _objectSpread(_objectSpread({}, theme), {}, { border: 'none', opacity: available ? 1 : 0.55, cursor: available ? 'pointer' : 'not-allowed' }) }, available && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("span", { className: "star", style: { top: 6, right: 8, color: '#FFD371' } }, "\u2728"), /*#__PURE__*/React.createElement("span", { className: "star", style: { bottom: 8, left: 8, color: '#FFE45E', animationDelay: '1s' } }, "\u2B50")), /*#__PURE__*/React.createElement("div", { className: "big-emoji" }, emoji), /*#__PURE__*/React.createElement("div", { className: "label" }, label), /*#__PURE__*/React.createElement("div", { className: "effect" }, effect), /*#__PURE__*/React.createElement("div", { style: { marginTop: 6, fontFamily: 'Gaegu', fontSize: 13, color: 'var(--c-ink)', opacity: 0.75 } }, "\uBCF4\uC720 ", stock));
 }
 
 // ─────────────────────────────────────────────────────────────
