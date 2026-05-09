@@ -4,19 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>&#127968; 우리 마을 경제 매니저</title>
-
-  <!-- 구글 폰트 -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Jua&family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
-
-  <!-- Firebase Compat SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
-  <!-- React 18 -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-
   <style>
 /* ───────────────────────────────────────────────
    우리 마을 경제 매니저 — 게임 UI 디자인 토큰
@@ -1569,7 +1562,7 @@ function StartScreen(_ref3) {
         groups: newGroups
       }));
     }
-    setActiveGroup(n);
+    setActiveGroup(String(n));
     setMode('student');
   };
   return /*#__PURE__*/React.createElement("div", {
@@ -1705,9 +1698,9 @@ function StartScreen(_ref3) {
       marginTop: 6
     }
   }, [1, 2, 3, 4].map(function (n) {
-    var isDone = groups[n] && groups[n].lastSubmittedRound === round;
+    var isDone = groups[String(n)] && groups[String(n)].lastSubmittedRound === round;
     var t = VILLAGE_THEME[String(n)];
-    var g = groups[n];
+    var g = groups[String(n)];
     return /*#__PURE__*/React.createElement("button", {
       key: n,
       onClick: function onClick() {
@@ -1777,7 +1770,7 @@ function StudentCalc(_ref4) {
     setMode = _ref4.setMode,
     activeGroup = _ref4.activeGroup;
   var gIdx = activeGroup;
-  var group = gameState.groups[gIdx];
+  var group = gameState.groups[String(gIdx)];
   var _useState13 = useState(EMPTY_ROUND_INPUT()),
     _useState14 = _slicedToArray(_useState13, 2),
     ri = _useState14[0],
@@ -1804,7 +1797,7 @@ function StudentCalc(_ref4) {
       updatedGroup.coins += 2;
     }
     saveState(_objectSpread(_objectSpread({}, gameState), {}, {
-      groups: _objectSpread(_objectSpread({}, gameState.groups), {}, _defineProperty({}, gIdx, updatedGroup))
+      groups: _objectSpread(_objectSpread({}, gameState.groups), {}, _defineProperty({}, String(gIdx), updatedGroup))
     }));
   };
 
@@ -1974,7 +1967,7 @@ function StudentCalc(_ref4) {
               tradeCount: nextTradeCount
             }); // Firebase에 저장 (교사 화면 자동 갱신)
             saveState(_objectSpread(_objectSpread({}, gameState), {}, {
-              groups: _objectSpread(_objectSpread({}, gameState.groups), {}, _defineProperty({}, gIdx, updatedGroup))
+              groups: _objectSpread(_objectSpread({}, gameState.groups), {}, _defineProperty({}, String(gIdx), updatedGroup))
             }));
             setSaving(false);
             setShowConfirm(false);
@@ -2571,7 +2564,7 @@ function TeacherBoard(_ref22) {
     var prev = prevGroupsRef.current;
     for (var n = 1; n <= 4; n++) {
       var prevG = prev[n];
-      var currG = groups[n];
+      var currG = groups[String(n)];
       if (currG && (!prevG || prevG.lastSubmittedRound !== currG.lastSubmittedRound)) {
         setFlashGroup(n);
         setLastUpdate(new Date());
@@ -2648,7 +2641,7 @@ function TeacherBoard(_ref22) {
   }, "\u26A0\uFE0F"))), /*#__PURE__*/React.createElement("div", {
     className: "tv-grid"
   }, [1, 2, 3, 4].map(function (n) {
-    var g = groups[n];
+    var g = groups[String(n)];
     var isFlashing = flashGroup === n;
     if (!g) {
       return /*#__PURE__*/React.createElement("div", {
@@ -2742,7 +2735,7 @@ function TeacherBoard(_ref22) {
     className: "tv-footer-q"
   }, /*#__PURE__*/React.createElement("div", {
     className: "lbl"
-  }, "\u25B8 \uD575\uC2EC \uC9C8\uBB38"), /*#__PURE__*/React.createElement("p", null, "Q. ", ROUND_QUESTIONS[String(round)])), ROUND_EVENTS[round] && /*#__PURE__*/React.createElement("div", {
+  }, "\u25B8 \uD575\uC2EC \uC9C8\uBB38"), /*#__PURE__*/React.createElement("p", null, "Q. ", ROUND_QUESTIONS[String(round)])), ROUND_EVENTS[String(round)] && /*#__PURE__*/React.createElement("div", {
     className: "tv-footer-e"
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -2750,9 +2743,9 @@ function TeacherBoard(_ref22) {
     }
   }, "\uD83D\uDCE2"), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     className: "ev-name"
-  }, ROUND_EVENTS[round].name), /*#__PURE__*/React.createElement("div", {
+  }, ROUND_EVENTS[String(round)].name), /*#__PURE__*/React.createElement("div", {
     className: "ev-desc"
-  }, ROUND_EVENTS[round].desc)))), showResetConfirm && /*#__PURE__*/React.createElement("div", {
+  }, ROUND_EVENTS[String(round)].desc)))), showResetConfirm && /*#__PURE__*/React.createElement("div", {
     className: "modal-bg"
   }, /*#__PURE__*/React.createElement("div", {
     style: {
