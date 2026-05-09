@@ -807,7 +807,7 @@ input { font-family: inherit; }
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
   gap: clamp(10px, 1.6vh, 22px) clamp(10px, 1vw, 18px);
-  margin-top: clamp(10px, 1.4vh, 18px); /* room for floating group tags */
+  margin-top: clamp(4px, 0.6vh, 8px); /* group-tag 카드 내부 배치로 여백 축소 */
 }
 
 .tv-card-big {
@@ -822,28 +822,31 @@ input { font-family: inherit; }
   min-height: 0;
   min-width: 0;
   gap: clamp(8px, 1.2vh, 14px);
-  overflow: hidden;
+  overflow: visible;
 }
 .tv-card-big.done {
   border-color: rgba(108,255,177,0.7);
   box-shadow: 0 0 26px rgba(108,255,177,0.30), inset 0 0 22px rgba(108,255,177,0.10);
 }
 .tv-card-big .group-tag {
-  position: absolute; top: -12px; left: 18px;
-  padding: 4px 14px;
-  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  padding: 3px 12px;
+  border-radius: 999px;
   font-family: 'Jua', sans-serif;
   font-size: clamp(11px, 1.4vh, 14px);
   letter-spacing: 1.2px;
-  border: 2px solid white;
-  box-shadow: 0 0 14px var(--gt-glow);
+  border: 2px solid rgba(255,255,255,0.7);
+  box-shadow: 0 0 10px var(--gt-glow);
   background: var(--gt-bg);
   color: white;
   z-index: 2;
   white-space: nowrap;
-  max-width: calc(100% - 36px);
+  max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-bottom: -4px;
 }
 .tv-card-head {
   flex: 0 0 auto;
