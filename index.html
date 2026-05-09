@@ -1357,6 +1357,7 @@ function StudentCalc(_ref4) {
   if (!group.selectedGoal) {
     return /*#__PURE__*/React.createElement("div", { className: "sky-bg", style: { minHeight: '100vh', padding: 24, display: 'flex', alignItems: 'center' } },
       /*#__PURE__*/React.createElement("div", { className: "plate", style: { width: '100%', maxWidth: 600, margin: '0 auto', padding: 32 } },
+        /*#__PURE__*/React.createElement("button", { onClick: function onClick() { return setMode('start'); }, className: "pill", style: { marginBottom: 20 } }, "\u2190 \uBA54\uC778\uC73C\uB85C"),
         /*#__PURE__*/React.createElement("h2", { style: { fontFamily: 'Jua', textAlign: 'center', color: 'var(--wood-deep)', fontSize: 26, margin: '0 0 8px' } }, "\uD83D\uDEA9 \uC6B0\uB9AC \uB9C8\uC744\uC758 \uBAA9\uD45C\uB97C \uC815\uD574\uC8FC\uC138\uC694!"),
         /*#__PURE__*/React.createElement("p", { style: { textAlign: 'center', fontFamily: 'Gaegu', fontSize: 18, marginBottom: 24, color: 'var(--ink-soft)' } }, "\uC120\uC0DD\uB2D8\uC774 \uC815\uD574\uC8FC\uC2E0 \uC6B0\uB9AC \uBAA8\uB460\uC758 \uBAA9\uD45C\uB97C \uD074\uB9AD\uD558\uC138\uC694."),
         /*#__PURE__*/React.createElement("div", { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 } },
@@ -1524,7 +1525,7 @@ function StudentCalc(_ref4) {
   
   var happiness = calcHappiness(group.happyBase, group.facilities);
   var theme = VILLAGE_THEME[String(gIdx)];
-  var currentGoal = VILLAGE_GOALS[group.selectedGoal];
+  var currentGoal = VILLAGE_GOALS[group.selectedGoal] || VILLAGE_GOALS['prosperous'];
   
   return /*#__PURE__*/React.createElement("div", {
     className: "sky-bg",
@@ -1686,6 +1687,9 @@ function TeacherBoard(_ref22) {
         isFlashing && /*#__PURE__*/React.createElement("div", { style: { position: 'absolute', top: 8, right: 12, background: '#6CFFB1', color: '#0E1B3D', borderRadius: 999, padding: '3px 12px', fontFamily: 'Jua', fontSize: 13, zIndex: 10 } }, "\uD83D\uDD25 \uBC29\uAE08 \uAC31\uC2E0\uB428!"),
         /*#__PURE__*/React.createElement("div", { className: "group-tag" }, n, "\uBAA8\uB460", isDone && /*#__PURE__*/React.createElement("span", { style: { marginLeft: 5, fontSize: '0.85em' } }, " \u2713")),
         /*#__PURE__*/React.createElement("div", { className: "tv-card-head" }, /*#__PURE__*/React.createElement("h3", null, VILLAGE_THEME[String(n)].roof, " ", g.name), /*#__PURE__*/React.createElement("span", { className: "trade-tag" }, "\uD83E\uDD1D \uAD50\uB958 ", g.tradeCount || 0, "\uD68C")),
+        g.selectedGoal && VILLAGE_GOALS[g.selectedGoal] && /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,228,94,0.12)', border: '1.5px solid rgba(255,228,94,0.4)', borderRadius: 10, padding: '4px 10px' } },
+          /*#__PURE__*/React.createElement("span", { style: { fontFamily: 'Jua', fontSize: 'clamp(10px,1.3vh,13px)', color: 'var(--neon-yellow)' } }, "\uD83C\uDFAF \uBAA9\uD45C:"),
+          /*#__PURE__*/React.createElement("span", { style: { fontFamily: 'Jua', fontSize: 'clamp(10px,1.3vh,13px)', color: 'white' } }, VILLAGE_GOALS[g.selectedGoal].title)),
         /*#__PURE__*/React.createElement("div", { className: "tv-stats-row" },
           /*#__PURE__*/React.createElement("div", { className: "tv-stat-big" }, /*#__PURE__*/React.createElement("div", { className: "lbl" }, "\uD589\uBCF5\uC9C0\uC218"), /*#__PURE__*/React.createElement("div", { className: "val", style: { color: happyColor, textShadow: "0 0 18px ".concat(happyShadow) } }, happy)),
           /*#__PURE__*/React.createElement("div", { className: "tv-stat-big" }, /*#__PURE__*/React.createElement("div", { className: "lbl" }, "\uCF54\uC778"), /*#__PURE__*/React.createElement("div", { className: "val", style: { color: 'var(--neon-yellow)', textShadow: '0 0 18px rgba(255,228,94,0.6)' } }, "\uD83D\uDCB0", g.coins))),
