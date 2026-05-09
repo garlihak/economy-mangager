@@ -1134,6 +1134,32 @@ var VILLAGE_THEME = {
   '3': { cls: 'vc-3', roof: '🏘️', tag: '바다 마을' },
   '4': { cls: 'vc-4', roof: '🏰', tag: '꽃잎 마을' }
 };
+var VILLAGE_GOALS = {
+  prosperous: {
+    title: "😊 풍요로운 마을",
+    condition: "행복지수 높은 마을",
+    desc: "주민들이 매일매일 웃어요!",
+    tip: "🏥병원, 🏫학교, 🎭관광지를 짓고 의료/문화 자원을 즉시 사용해 보세요!"
+  },
+  exchange: {
+    title: "🤝 교류왕 마을",
+    condition: "이웃과 가장 친한 마을",
+    desc: "이웃 마을과 가장 친해요!",
+    tip: "🛒시장을 지어 교류 보너스를 챙기고, 부족한 자원을 이웃에게 구해오세요!"
+  },
+  rich: {
+    title: "💰 부자 마을",
+    condition: "금고가 꽉 찬 마을",
+    desc: "우리 마을 금고가 꽉 찼어요!",
+    tip: "🏭공장에서 만든 제품을 수출하거나, 관광지 축제 보너스를 노려보세요!"
+  },
+  production: {
+    title: "🚜 생산 강국",
+    condition: "창고가 가득 찬 마을",
+    desc: "창고에 물건이 산더미처럼 쌓였어요!",
+    tip: "🌾논, ⚡발전소, 🏭공장을 많이 짓고 효율적으로 자원을 생산해 보세요!"
+  }
+};
 var EMPTY_BOUGHT = function EMPTY_BOUGHT() { return Object.fromEntries(Object.keys(FACILITIES).map(function (k) { return [k, 0]; })); };
 var EMPTY_TRADE = function EMPTY_TRADE() { return { rice: 0, electricity: 0, medical: 0, product: 0, culture: 0, coins: 0 }; };
 var EMPTY_ROUND_INPUT = function EMPTY_ROUND_INPUT() { return { bought: EMPTY_BOUGHT(), tradeIn: EMPTY_TRADE(), tradeOut: EMPTY_TRADE() }; };
@@ -1319,6 +1345,30 @@ function StudentCalc(_ref4) {
   
   if (!group) return null;
 
+  // 🔥 퀘스트 목표 선택 함수
+  var handleSelectGoal = function handleSelectGoal(goalKey) {
+    var updatedGroup = _objectSpread(_objectSpread({}, group), {}, { selectedGoal: goalKey });
+    saveState(_objectSpread(_objectSpread({}, gameState), {}, {
+      groups: _objectSpread(_objectSpread({}, gameState.groups), {}, _defineProperty({}, String(gIdx), updatedGroup))
+    }));
+  };
+
+  // 🔥 목표 선택 화면 (아직 모둠 목표를 정하지 않았을 때) [cite: 2]
+  if (!group.selectedGoal) {
+    return /*#__PURE__*/React.createElement("div", { className: "sky-bg", style: { minHeight: '100vh', padding: 24, display: 'flex', alignItems: 'center' } },
+      /*#__PURE__*/React.createElement("div", { className: "plate", style: { width: '100%', maxWidth: 600, margin: '0 auto', padding: 32 } },
+        /*#__PURE__*/React.createElement("h2", { style: { fontFamily: 'Jua', textAlign: 'center', color: 'var(--wood-deep)', fontSize: 26, margin: '0 0 8px' } }, "\uD83D\uDEA9 \uC6B0\uB9AC \uB9C8\uC744\uC758 \uBAA9\uD45C\uB97C \uC815\uD574\uC8FC\uC138\uC694!"),
+        /*#__PURE__*/React.createElement("p", { style: { textAlign: 'center', fontFamily: 'Gaegu', fontSize: 18, marginBottom: 24, color: 'var(--ink-soft)' } }, "\uC120\uC0DD\uB2D8\uC774 \uC815\uD574\uC8FC\uC2E0 \uC6B0\uB9AC \uBAA8\uB460\uC758 \uBAA9\uD45C\uB97C \uD074\uB9AD\uD558\uC138\uC694."),
+        /*#__PURE__*/React.createElement("div", { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 } },
+          Object.entries(VILLAGE_GOALS).map(function (_ref) {
+            var _ref2 = _slicedToArray(_ref, 2), key = _ref2[0], goal = _ref2[1];
+            return /*#__PURE__*/React.createElement("button", { key: key, onClick: function onClick() { return handleSelectGoal(key); }, className: "btn3d muted", style: { fontSize: 20, padding: '20px 10px', background: 'white' } }, goal.title);
+          })
+        )
+      )
+    );
+  }
+
   // 1. 이벤트 수동 적용 함수
   var handleApplyEvent = function handleApplyEvent() {
     var updatedGroup = _objectSpread({}, group);
@@ -1471,8 +1521,11 @@ function StudentCalc(_ref4) {
     }));
     return function executeApply() { return _ref7.apply(this, arguments); };
   }();
+  
   var happiness = calcHappiness(group.happyBase, group.facilities);
   var theme = VILLAGE_THEME[String(gIdx)];
+  var currentGoal = VILLAGE_GOALS[group.selectedGoal];
+  
   return /*#__PURE__*/React.createElement("div", {
     className: "sky-bg",
     style: { minHeight: '100vh', paddingBottom: 120, position: 'relative' }
@@ -1511,6 +1564,20 @@ function StudentCalc(_ref4) {
       /*#__PURE__*/React.createElement("div", { style: { display: 'flex', gap: 8 } },
         /*#__PURE__*/React.createElement("span", { className: "coin-pill" }, "\uD83D\uDCB0 ", group.coins),
         /*#__PURE__*/React.createElement("span", { className: "heart-pill" }, "\uD83D\uDC9A ", happiness)))),
+        
+  /* 🔥 메인 퀘스트 상자 (HUD 바로 아래 노출) */
+  /*#__PURE__*/React.createElement("div", { style: { maxWidth: 720, margin: '0 auto', padding: '16px 18px 0' } },
+    /*#__PURE__*/React.createElement("div", { className: "plate-soft", style: { padding: '12px 16px', background: '#FFFDF0', border: '2px solid #FFD371' } },
+      /*#__PURE__*/React.createElement("div", { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' } },
+        /*#__PURE__*/React.createElement("span", { style: { fontFamily: 'Jua', color: '#B57D14', fontSize: 14 } }, "\uD83C\uDFAF \uC6B0\uB9AC\uC758 \uBA54\uC778 \uD018\uC2A4\uD2B8"),
+        /*#__PURE__*/React.createElement("span", { className: "tag-num", style: { background: '#FFD371', color: '#5A3A22' } }, currentGoal.condition)
+      ),
+      /*#__PURE__*/React.createElement("div", { style: { fontFamily: 'Jua', fontSize: 20, margin: '4px 0' } }, currentGoal.title),
+      /*#__PURE__*/React.createElement("p", { style: { fontFamily: 'Gaegu', fontSize: 15, color: '#8A6B4F', margin: 0 } }, currentGoal.desc),
+      /*#__PURE__*/React.createElement("div", { style: { marginTop: 8, padding: '6px 10px', background: '#FFF', borderRadius: 8, fontSize: 14, border: '1px dashed #FFD371', fontFamily: 'Gaegu', color: '#5A3A22' } }, "\uD83D\uDCA1 ", /*#__PURE__*/React.createElement("b", null, "\uACF5\uB7B5 \uD301:"), " ", currentGoal.tip)
+    )
+  ),
+  
   /*#__PURE__*/React.createElement("div", { style: { maxWidth: 720, margin: '0 auto', padding: '24px 18px' } },
     /*#__PURE__*/React.createElement("div", { className: "bubble banner-econ", style: { marginBottom: 14 } },
       /*#__PURE__*/React.createElement("div", { style: { fontFamily: 'Jua', fontSize: 16, color: '#5A2D8A' } }, "🏛️ 기본 경제 — 정산 시 기본 ", /*#__PURE__*/React.createElement("b", { style: { color: 'var(--leaf-deep)' } }, "+5 코인"), " (행복도 40 미만 ", /*#__PURE__*/React.createElement("b", { style: { color: 'var(--berry-deep)' } }, "+2"), ", 20 미만 ", /*#__PURE__*/React.createElement("b", { style: { color: 'var(--berry-deep)' } }, "0"), "), ", /*#__PURE__*/React.createElement("b", { style: { color: 'var(--berry-deep)' } }, "쌀 2개"), " 소비!")),
