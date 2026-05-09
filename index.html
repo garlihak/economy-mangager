@@ -1386,7 +1386,7 @@ function StudentCalc(_ref4) {
   var executeApply = /*#__PURE__*/function () {
     var _ref7 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee() {
       var _group$happyBase;
-      var nextCoins, nextResources, nextFacilities, nextHappyBase, didTrade, nextTradeCount, runCount, i, riceToEat, updatedGroup;
+      var nextCoins, nextResources, nextFacilities, nextHappyBase, didTrade, nextTradeCount, runCount, i, riceToEat, updatedGroup, currentHappinessForIncome, roundIncome;
       return _regenerator().w(function (_context) {
         while (1) switch (_context.n) {
           case 0:
@@ -1409,8 +1409,19 @@ function StudentCalc(_ref4) {
               var _ref11 = _slicedToArray(_ref10, 2), res = _ref11[0], val = _ref11[1];
               if (res !== 'coins') nextResources[res] = (nextResources[res] || 0) - val;
             });
+            
             if (didTrade && nextFacilities.market > 0) nextCoins += 1;
-            nextCoins += 5;
+            
+            // 🔥 행복도에 따른 수입 계산 로직 추가
+            currentHappinessForIncome = calcHappiness(nextHappyBase, nextFacilities);
+            roundIncome = 5; // 기본 지원금
+            if (currentHappinessForIncome < 20) {
+              roundIncome = 0; // 행복도 20 미만 시 +0코인
+            } else if (currentHappinessForIncome < 40) {
+              roundIncome = 2; // 행복도 40 미만 시 +2코인
+            }
+            nextCoins += roundIncome;
+
             Object.entries(nextFacilities).forEach(function (_ref12) {
               var _FACILITIES$id2;
               var _ref13 = _slicedToArray(_ref12, 2), id = _ref13[0], cnt = _ref13[1];
@@ -1439,8 +1450,6 @@ function StudentCalc(_ref4) {
               nextHappyBase = Math.max(0, nextHappyBase - 5);
               nextResources.rice = 0;
             }
-            
-            // 기존 4~7라운드 하드코딩 부분은 handleApplyEvent로 옮겨졌으므로 이 곳에서는 삭제되었습니다.
 
             updatedGroup = _objectSpread(_objectSpread({}, group), {}, {
               coins: nextCoins,
@@ -1504,7 +1513,7 @@ function StudentCalc(_ref4) {
         /*#__PURE__*/React.createElement("span", { className: "heart-pill" }, "\uD83D\uDC9A ", happiness)))),
   /*#__PURE__*/React.createElement("div", { style: { maxWidth: 720, margin: '0 auto', padding: '24px 18px' } },
     /*#__PURE__*/React.createElement("div", { className: "bubble banner-econ", style: { marginBottom: 14 } },
-      /*#__PURE__*/React.createElement("div", { style: { fontFamily: 'Jua', fontSize: 16, color: '#5A2D8A' } }, "\uD83C\uDFDB\uFE0F \uAE30\uBCF8 \uACBD\uC81C \u2014 \uC815\uC0B0 \uC2DC ", /*#__PURE__*/React.createElement("b", { style: { color: 'var(--leaf-deep)' } }, "+5 \uCF54\uC778"), " \uB4E4\uC5B4\uC624\uACE0, ", /*#__PURE__*/React.createElement("b", { style: { color: 'var(--berry-deep)' } }, "\uC300 2\uAC1C"), " \uC18C\uBE44!")),
+      /*#__PURE__*/React.createElement("div", { style: { fontFamily: 'Jua', fontSize: 16, color: '#5A2D8A' } }, "🏛️ 기본 경제 — 정산 시 기본 ", /*#__PURE__*/React.createElement("b", { style: { color: 'var(--leaf-deep)' } }, "+5 코인"), " (행복도 40 미만 ", /*#__PURE__*/React.createElement("b", { style: { color: 'var(--berry-deep)' } }, "+2"), ", 20 미만 ", /*#__PURE__*/React.createElement("b", { style: { color: 'var(--berry-deep)' } }, "0"), "), ", /*#__PURE__*/React.createElement("b", { style: { color: 'var(--berry-deep)' } }, "쌀 2개"), " 소비!")),
     /*#__PURE__*/React.createElement("div", { className: "bubble banner-info-blue", style: { marginBottom: 24 } },
       /*#__PURE__*/React.createElement("div", { style: { fontFamily: 'Gaegu', fontSize: 17, color: 'var(--in-ink)' } }, "\uD83D\uDCA1 ", /*#__PURE__*/React.createElement("b", null, "\uAFC0\uD301!"), " \uCF54\uC778\uC774 \uBD80\uC871\uD560 \uB550 \uC6B0\uB9AC \uB9C8\uC744\uC758 ", /*#__PURE__*/React.createElement("b", null, "\uB0A8\uB294 \uC790\uC6D0\uC744 \uC774\uC6C3 \uB9C8\uC744\uC5D0 \uD314\uC544\uC11C"), " \uCF54\uC778\uC744 \uBC8C\uC5B4\uBCF4\uC138\uC694!")),
     /*#__PURE__*/React.createElement(SectionTitle, { icon: "\u2728", text: "\uC790\uC6D0 \uC989\uC2DC \uC0AC\uC6A9\uD558\uAE30", sub: "(\uC218\uC694 \uCC3D\uCD9C)", accent: "#4F8A2E" }),
