@@ -1372,6 +1372,9 @@ function useGameState(db, fbReady) {
     var onValue = ref.on('value', function (snapshot) {
       var data = snapshot.val();
       if (data) {
+        // groups가 없거나 null이면 빈 객체로 보장
+        if (!data.groups) data.groups = {};
+        if (typeof data.round !== 'number') data.round = 1;
         setGameState(data);
       } else {
         // 데이터 없으면 초기값 쓰기
@@ -1553,7 +1556,7 @@ function StartScreen(_ref3) {
     setMode = _ref3.setMode,
     setActiveGroup = _ref3.setActiveGroup;
   var round = gameState.round,
-    groups = gameState.groups;
+    groups = gameState.groups || {};
   var enterGroup = function enterGroup(n) {
     var newGroups = _objectSpread({}, groups);
     if (!newGroups[n]) {
@@ -2544,7 +2547,7 @@ function TeacherBoard(_ref22) {
     resetState = _ref22.resetState,
     setMode = _ref22.setMode;
   var round = gameState.round,
-    groups = gameState.groups;
+    groups = gameState.groups || {};
   var _useState19 = useState(false),
     _useState20 = _slicedToArray(_useState19, 2),
     showResetConfirm = _useState20[0],
