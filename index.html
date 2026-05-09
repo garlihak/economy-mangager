@@ -1074,11 +1074,12 @@ function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
 //   학생 태블릿 입력 → Firebase → 교사 전자칠판 자동 갱신
 // ═══════════════════════════════════════════════════════════════
 
-var _React = React,
-  useState = _React.useState,
-  useEffect = _React.useEffect,
-  useRef = _React.useRef,
-  useCallback = _React.useCallback;
+// React 훅 — Firebase compat SDK 가 전역 스코프를 건드리는 것을 방지하기 위해
+// 항상 React.* 를 통해 동적으로 참조합니다.
+var useState    = function() { return React.useState.apply(React, arguments); };
+var useEffect   = function() { return React.useEffect.apply(React, arguments); };
+var useRef      = function() { return React.useRef.apply(React, arguments); };
+var useCallback = function() { return React.useCallback.apply(React, arguments); };
 
 // ─────────────────────────────────────────────────────────────
 //  🔥 Firebase 설정
