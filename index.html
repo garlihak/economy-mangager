@@ -840,6 +840,10 @@ input { font-family: inherit; }
   background: var(--gt-bg);
   color: white;
   z-index: 2;
+  white-space: nowrap;
+  max-width: calc(100% - 36px);
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .tv-card-head {
   flex: 0 0 auto;
@@ -1559,8 +1563,8 @@ function StartScreen(_ref3) {
     groups = gameState.groups || {};
   var enterGroup = function enterGroup(n) {
     var newGroups = _objectSpread({}, groups);
-    if (!newGroups[n]) {
-      newGroups[n] = INIT_GROUP(n);
+    if (!newGroups[String(n)]) {
+      newGroups[String(n)] = INIT_GROUP(n);
       saveState(_objectSpread(_objectSpread({}, gameState), {}, {
         groups: newGroups
       }));
@@ -2566,7 +2570,7 @@ function TeacherBoard(_ref22) {
   useEffect(function () {
     var prev = prevGroupsRef.current;
     for (var n = 1; n <= 4; n++) {
-      var prevG = prev[n];
+      var prevG = prev[String(n)];
       var currG = groups[String(n)];
       if (currG && (!prevG || prevG.lastSubmittedRound !== currG.lastSubmittedRound)) {
         setFlashGroup(n);
@@ -2687,7 +2691,7 @@ function TeacherBoard(_ref22) {
       }
     }, "\uD83D\uDD25 \uBC29\uAE08 \uAC31\uC2E0\uB428!"), /*#__PURE__*/React.createElement("div", {
       className: "group-tag"
-    }, n, "\uBAA8\uB460 ", isDone && '· 완료 ✓'), /*#__PURE__*/React.createElement("div", {
+    }, n, "\uBAA8\uB460", isDone && /*#__PURE__*/React.createElement("span", {style:{marginLeft:5,fontSize:'0.85em'}}, " ✓")), /*#__PURE__*/React.createElement("div", {
       className: "tv-card-head"
     }, /*#__PURE__*/React.createElement("h3", null, VILLAGE_THEME[String(n)].roof, " ", g.name), /*#__PURE__*/React.createElement("span", {
       className: "trade-tag"
