@@ -1116,7 +1116,7 @@ var RESOURCES = {
 var ROUND_EVENTS = {
   '3': { name: '🌧️ 가뭄 발생', desc: '이번 라운드 쌀 생산량이 30% 감소합니다. 쌀이 부족해지지 않도록 주의하세요!' },
   '4': { name: '🦠 전염병 경보', desc: '마을의 기본 행복지수가 -10 감소합니다. 병원이 있으면 -5로 경감! 의료 자원으로 치료하세요!' },
-  '5': { name: '🤝 기술 교류 제안', desc: '학교가 있는 마을은 행복 +5 보너스! 이번 라운드 교류를 1회 무료로 할 수 있어요.' },
+  '5': { name: '🤝 교류 개방의 날', desc: '학교가 있는 마을은 행복 +5 보너스! 이번 라운드부터 이웃 마을과 교류를 시작해요.' },
   '6': { name: '🎭 문화 축제 개최', desc: '관광지가 있는 마을은 행복 +5, 코인 +3 보너스!' },
   '7': { name: '🏅 품질 인증 획득', desc: '논이 2개 이상인 마을은 코인 +5 보너스! 농업 마을의 역습!' },
   '8': { name: '🌊 홍수 피해', desc: '정산 시 쌀이 2개 추가로 유실됩니다. 쌀이 충분한 마을과 교류하면 위기를 넘길 수 있어요!' }
@@ -1127,7 +1127,7 @@ var ROUND_QUESTIONS = {
   '3': '가뭄이 왔을 때 우리 마을 쌀이 부족했다면, 어떻게 해결할 수 있을까?',
   '4': '전염병 위기를 교류 없이 해결할 방법이 있어? 왜 교류가 필요할까?',
   '5': '어느 마을과 교류하는 게 가장 합리적인 선택이야? 근거는?',
-  '6': '교류 후 수치로 뭐가 달라졌어? 물자·기술·문화 교류는 어떻게 달라?',
+  '6': '교류 후 수치로 뭐가 달라졌어? 물자 교류와 문화 교류는 어떻게 달라?',
   '7': '교류 횟수와 행복지수 사이에 어떤 관계가 보여? 근거는?',
   '8': '교류가 없었다면 우리 마을은 지금 어떻게 됐을까? 데이터로 설명해봐.'
 };
@@ -1152,7 +1152,7 @@ var VILLAGE_GOALS = {
     title: "🤝 교류왕 마을",
     condition: "교류 점수 1등",
     desc: "여러 마을과 다양한 방식으로 잘 연결돼요!",
-    tip: "1차 지정 교류는 기본, 2차 자유 교류와 새 상대·새 종류 보너스를 노려보세요! 🛒시장이 있으면 교류 점수도 유리해요!"
+    tip: "1차 지정 교류는 기본, 2차 자유 교류와 새 상대·문화 포함 보너스를 노려보세요! 🛒시장이 있으면 교류 점수도 유리해요!"
   },
   rich: {
     title: "💰 부자 마을",
@@ -1186,8 +1186,8 @@ var EMPTY_BOUGHT = function EMPTY_BOUGHT() { return Object.fromEntries(Object.ke
 var EMPTY_TRADE = function EMPTY_TRADE() { return { rice: 0, electricity: 0, medical: 0, product: 0, culture: 0, coins: 0 }; };
 var EMPTY_ROUND_INPUT = function EMPTY_ROUND_INPUT() { return { bought: EMPTY_BOUGHT(), tradeIn: EMPTY_TRADE(), tradeOut: EMPTY_TRADE() }; };
 
-var TRADE_TYPES = ['물자', '기술', '문화'];
-var EMPTY_TRADE_SLOT = function EMPTY_TRADE_SLOT(slot) { return { slot: slot, partner: '', type: '물자', tradeIn: EMPTY_TRADE(), tradeOut: EMPTY_TRADE() }; };
+var TRADE_MATERIAL_KEYS = ['rice', 'electricity', 'medical', 'product', 'coins'];
+var EMPTY_TRADE_SLOT = function EMPTY_TRADE_SLOT(slot) { return { slot: slot, partner: '', tradeIn: EMPTY_TRADE(), tradeOut: EMPTY_TRADE() }; };
 var EMPTY_TRADE_DRAFTS = function EMPTY_TRADE_DRAFTS() { return { first: EMPTY_TRADE_SLOT(1), second: EMPTY_TRADE_SLOT(2) }; };
 var TRADE_PARTNERS = {
   '5': { '1':'3', '3':'1', '2':'4', '4':'2' },
@@ -1211,23 +1211,41 @@ function tradeHasValue(slot) {
   var tOut = slot.tradeOut || EMPTY_TRADE();
   return Object.values(tIn).some(function(v){ return (parseInt(v) || 0) > 0; }) || Object.values(tOut).some(function(v){ return (parseInt(v) || 0) > 0; });
 }
+function getTradeCategories(slot) {
+  var tIn = slot && slot.tradeIn ? slot.tradeIn : EMPTY_TRADE();
+  var tOut = slot && slot.tradeOut ? slot.tradeOut : EMPTY_TRADE();
+  var hasMaterial = TRADE_MATERIAL_KEYS.some(function(k) { return ((parseInt(tIn[k]) || 0) > 0) || ((parseInt(tOut[k]) || 0) > 0); });
+  var hasCulture = ((parseInt(tIn.culture) || 0) > 0) || ((parseInt(tOut.culture) || 0) > 0);
+  var labels = [];
+  if (hasMaterial) labels.push('물자');
+  if (hasCulture) labels.push('문화');
+  return labels;
+}
+function getTradeTypeLabel(slot) {
+  var labels = getTradeCategories(slot);
+  return labels.length ? labels.join(' + ') : '입력 전';
+}
+function tradeIncludesCulture(slot) {
+  return getTradeCategories(slot).indexOf('문화') >= 0;
+}
 function getTradeCost(slotKey, group) {
   if (slotKey !== 'second') return 0;
   return group && group.facilities && group.facilities.market > 0 ? 1 : 2;
 }
-function calcTradeScoreInfo(group, round, slotKey, partner, type) {
+function calcTradeScoreInfo(group, round, slotKey, partner, draft) {
   var base = slotKey === 'second' ? 2 : 1;
   var partnerKey = partner ? String(partner) : '';
-  var typeKey = type || '물자';
   var isNewPartner = !!partnerKey && !(group && group.tradePartners && group.tradePartners[partnerKey]);
-  var isNewType = !!typeKey && !(group && group.tradeTypes && group.tradeTypes[typeKey]);
+  var hasCulture = tradeIncludesCulture(draft);
+  var isFirstCulture = hasCulture && !(group && group.tradeTypes && group.tradeTypes['문화']);
   var marketBonus = group && group.facilities && group.facilities.market > 0 ? 1 : 0;
   return {
     base: base,
     newPartner: isNewPartner ? 1 : 0,
-    newType: isNewType ? 1 : 0,
+    cultureFirst: isFirstCulture ? 1 : 0,
     market: marketBonus,
-    total: base + (isNewPartner ? 1 : 0) + (isNewType ? 1 : 0) + marketBonus
+    typeLabel: getTradeTypeLabel(draft),
+    total: base + (isNewPartner ? 1 : 0) + (isFirstCulture ? 1 : 0) + marketBonus
   };
 }
 function getTradeProblem(group, round, slotKey, draft, roundTrades, gIdx) {
@@ -1597,7 +1615,7 @@ function StudentCalc(_ref4) {
     }
     setSaving(true);
     var cost = getTradeCost(slotKey, group);
-    var scoreInfo = calcTradeScoreInfo(group, gameState.round, slotKey, draft.partner, draft.type);
+    var scoreInfo = calcTradeScoreInfo(group, gameState.round, slotKey, draft.partner, draft);
     var nextResources = _objectSpread({}, group.resources);
     Object.keys(RESOURCES).forEach(function (id) {
       nextResources[id] = (nextResources[id] || 0) + ((draft.tradeIn && draft.tradeIn[id]) || 0) - ((draft.tradeOut && draft.tradeOut[id]) || 0);
@@ -1606,14 +1624,17 @@ function StudentCalc(_ref4) {
     var nextPartners = _objectSpread({}, group.tradePartners || {});
     nextPartners[String(draft.partner)] = true;
     var nextTypes = _objectSpread({}, group.tradeTypes || {});
-    nextTypes[draft.type || '물자'] = true;
+    var tradeCategories = getTradeCategories(draft);
+    var tradeTypeLabel = getTradeTypeLabel(draft);
+    if (tradeCategories.indexOf('문화') >= 0) nextTypes['문화'] = true;
     var nextRoundTrades = _objectSpread({}, group.roundTrades || {});
     var thisRound = _objectSpread({}, nextRoundTrades[String(gameState.round)] || {});
     thisRound[slotKey] = {
       confirmed: true,
       slot: slotKey === 'first' ? 1 : 2,
       partner: String(draft.partner),
-      type: draft.type || '물자',
+      type: tradeTypeLabel,
+      types: tradeCategories,
       tradeIn: copyTradeBundle(draft.tradeIn),
       tradeOut: copyTradeBundle(draft.tradeOut),
       cost: cost,
@@ -1767,8 +1788,8 @@ function StudentCalc(_ref4) {
   var designatedPartner = getDesignatedPartner(gameState.round, gIdx);
   var firstDraft = _objectSpread(_objectSpread({}, tradeDrafts.first), {}, { partner: designatedPartner || tradeDrafts.first.partner });
   var secondDraft = tradeDrafts.second;
-  var firstScoreInfo = calcTradeScoreInfo(group, gameState.round, 'first', firstDraft.partner, firstDraft.type);
-  var secondScoreInfo = calcTradeScoreInfo(group, gameState.round, 'second', secondDraft.partner, secondDraft.type);
+  var firstScoreInfo = calcTradeScoreInfo(group, gameState.round, 'first', firstDraft.partner, firstDraft);
+  var secondScoreInfo = calcTradeScoreInfo(group, gameState.round, 'second', secondDraft.partner, secondDraft);
   var firstTradeProblem = getTradeProblem(group, gameState.round, 'first', firstDraft, roundTrades, gIdx);
   var secondTradeProblem = getTradeProblem(group, gameState.round, 'second', secondDraft, roundTrades, gIdx);
   
@@ -2021,13 +2042,12 @@ function TradeSlotPanel(props) {
       /*#__PURE__*/React.createElement("option", { value: "" }, "\uC120\uD0DD"),
       partnerOptions.map(function(p){ return /*#__PURE__*/React.createElement("option", { key:p, value:p }, p, "\uBAA8\uB460"); })
     );
-    var typeInput = /*#__PURE__*/React.createElement("select", { value: draft.type || '물자', onChange: function onChange(e) { return onPatch({ type: e.target.value }); }, style: { marginTop:6, width:'100%', height:40, borderRadius:12, border:'2px solid var(--wood-light)', fontFamily:'Jua', padding:'0 10px', background:'white', color:'var(--ink)' } },
-      TRADE_TYPES.map(function(t){ return /*#__PURE__*/React.createElement("option", { key:t, value:t }, t); })
-    );
+    var typeLabel = getTradeTypeLabel(draft);
+    var typeInput = /*#__PURE__*/React.createElement("div", { style: { marginTop:6, padding:'9px 12px', background:'white', border:'2px solid var(--wood-light)', borderRadius:12, fontFamily:'Jua', color: typeLabel === '입력 전' ? 'var(--ink-soft)' : 'var(--ink)' } }, typeLabel, typeLabel !== '입력 전' ? " 교류" : "");
     var scoreBox = /*#__PURE__*/React.createElement("div", { style: { background:'white', border:'2px dashed #F2D9A8', borderRadius:14, padding:'10px 12px', fontFamily:'Gaegu', fontSize:15, color:'var(--ink)' } },
       "\uC608\uC0C1 \uC810\uC218: \uAE30\uBCF8 +", scoreInfo.base,
       scoreInfo.newPartner ? " · \uC0C8 \uC0C1\uB300 +1" : "",
-      scoreInfo.newType ? " · \uC0C8 \uC885\uB958 +1" : "",
+      scoreInfo.cultureFirst ? " · \uBB38\uD654 \uCCAB \uAD50\uB958 +1" : "",
       scoreInfo.market ? " · \uC2DC\uC7A5 +1" : "",
       " = ", /*#__PURE__*/React.createElement("b", { style: { color:'var(--berry-deep)' } }, "+", scoreInfo.total, "\uC810"),
       cost > 0 && /*#__PURE__*/React.createElement("div", { style: { marginTop:4, color:'#7A4D0C' } }, "\uD83D\uDCB0 2\uCC28 \uAD50\uB958 \uBE44\uC6A9: ", cost, "\uCF54\uC778"),
