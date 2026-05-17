@@ -1150,9 +1150,9 @@ var VILLAGE_GOALS = {
   },
   exchange: {
     title: "🤝 교류왕 마을",
-    condition: "이웃과 가장 친한 마을",
-    desc: "이웃 마을과 가장 친해요!",
-    tip: "🛒시장을 지어 교류 보너스를 챙기고, 부족한 자원을 이웃에게 구해오세요!"
+    condition: "교류 점수 1등",
+    desc: "여러 마을과 다양한 방식으로 잘 연결돼요!",
+    tip: "1차 지정 교류는 기본, 2차 자유 교류와 새 상대·새 종류 보너스를 노려보세요! 🛒시장이 있으면 교류 점수도 유리해요!"
   },
   rich: {
     title: "💰 부자 마을",
@@ -1173,24 +1173,93 @@ function calcGoalResults(groups) {
     if (!g) return null;
     var happy = calcHappiness(g.happyBase, g.facilities);
     var totalRes = Object.values(g.resources || {}).reduce(function(s,v){ return s+(v||0); }, 0);
-    return { n:n, happy:happy, tradeCount:g.tradeCount||0, coins:g.coins||0, totalRes:totalRes, selectedGoal:g.selectedGoal };
+    return { n:n, happy:happy, tradeCount:g.tradeCount||0, tradeScore:(g.tradeScore||g.tradeCount||0), coins:g.coins||0, totalRes:totalRes, selectedGoal:g.selectedGoal };
   }).filter(Boolean);
   function winners(key) {
     var max = Math.max.apply(null, entries.map(function(e){ return e[key]; }));
     return entries.filter(function(e){ return e[key]===max; }).map(function(e){ return e.n; });
   }
-  return { prosperous:winners('happy'), exchange:winners('tradeCount'), rich:winners('coins'), production:winners('totalRes') };
+  return { prosperous:winners('happy'), exchange:winners('tradeScore'), rich:winners('coins'), production:winners('totalRes') };
 }
 
 var EMPTY_BOUGHT = function EMPTY_BOUGHT() { return Object.fromEntries(Object.keys(FACILITIES).map(function (k) { return [k, 0]; })); };
 var EMPTY_TRADE = function EMPTY_TRADE() { return { rice: 0, electricity: 0, medical: 0, product: 0, culture: 0, coins: 0 }; };
 var EMPTY_ROUND_INPUT = function EMPTY_ROUND_INPUT() { return { bought: EMPTY_BOUGHT(), tradeIn: EMPTY_TRADE(), tradeOut: EMPTY_TRADE() }; };
+
+var TRADE_TYPES = ['물자', '기술', '문화'];
+var EMPTY_TRADE_SLOT = function EMPTY_TRADE_SLOT(slot) { return { slot: slot, partner: '', type: '물자', tradeIn: EMPTY_TRADE(), tradeOut: EMPTY_TRADE() }; };
+var EMPTY_TRADE_DRAFTS = function EMPTY_TRADE_DRAFTS() { return { first: EMPTY_TRADE_SLOT(1), second: EMPTY_TRADE_SLOT(2) }; };
+var TRADE_PARTNERS = {
+  '5': { '1':'3', '3':'1', '2':'4', '4':'2' },
+  '6': { '1':'2', '2':'1', '3':'4', '4':'3' },
+  '7': { '1':'4', '4':'1', '2':'3', '3':'2' }
+};
+function isTradeRound(round) { return round >= 5 && round <= 8; }
+function getDesignatedPartner(round, gIdx) {
+  var map = TRADE_PARTNERS[String(round)] || {};
+  return map[String(gIdx)] || '';
+}
+function getPartnerOptions(gIdx) {
+  return [1,2,3,4].filter(function(n){ return String(n) !== String(gIdx); }).map(function(n){ return String(n); });
+}
+function getRoundTrades(group, round) {
+  return group && group.roundTrades && group.roundTrades[String(round)] ? group.roundTrades[String(round)] : {};
+}
+function tradeHasValue(slot) {
+  if (!slot) return false;
+  var tIn = slot.tradeIn || EMPTY_TRADE();
+  var tOut = slot.tradeOut || EMPTY_TRADE();
+  return Object.values(tIn).some(function(v){ return (parseInt(v) || 0) > 0; }) || Object.values(tOut).some(function(v){ return (parseInt(v) || 0) > 0; });
+}
+function getTradeCost(slotKey, group) {
+  if (slotKey !== 'second') return 0;
+  return group && group.facilities && group.facilities.market > 0 ? 1 : 2;
+}
+function calcTradeScoreInfo(group, round, slotKey, partner, type) {
+  var base = slotKey === 'second' ? 2 : 1;
+  var partnerKey = partner ? String(partner) : '';
+  var typeKey = type || '물자';
+  var isNewPartner = !!partnerKey && !(group && group.tradePartners && group.tradePartners[partnerKey]);
+  var isNewType = !!typeKey && !(group && group.tradeTypes && group.tradeTypes[typeKey]);
+  var marketBonus = group && group.facilities && group.facilities.market > 0 ? 1 : 0;
+  return {
+    base: base,
+    newPartner: isNewPartner ? 1 : 0,
+    newType: isNewType ? 1 : 0,
+    market: marketBonus,
+    total: base + (isNewPartner ? 1 : 0) + (isNewType ? 1 : 0) + marketBonus
+  };
+}
+function getTradeProblem(group, round, slotKey, draft, roundTrades, gIdx) {
+  if (!isTradeRound(round)) return '교류는 R5부터 시작합니다.';
+  if (roundTrades && roundTrades[slotKey] && roundTrades[slotKey].confirmed) return '이미 확정한 교류입니다.';
+  var partner = draft && draft.partner ? String(draft.partner) : '';
+  if (!partner) return '상대 마을을 선택하세요.';
+  var otherKey = slotKey === 'first' ? 'second' : 'first';
+  var other = roundTrades && roundTrades[otherKey];
+  if (other && other.confirmed && String(other.partner) === partner) return '같은 라운드에는 같은 마을과 2번 교류할 수 없어요.';
+  if (!tradeHasValue(draft)) return '받거나 줄 자원·코인을 1개 이상 입력하세요.';
+  var cost = getTradeCost(slotKey, group);
+  var coins = (group && group.coins) || 0;
+  var tradeInCoins = (draft.tradeIn && draft.tradeIn.coins) || 0;
+  var tradeOutCoins = (draft.tradeOut && draft.tradeOut.coins) || 0;
+  if (coins + tradeInCoins - tradeOutCoins - cost < 0) return '코인이 부족해요.';
+  var resources = group.resources || {};
+  var shortage = Object.keys(RESOURCES).find(function(id){ return ((draft.tradeOut && draft.tradeOut[id]) || 0) > (resources[id] || 0); });
+  if (shortage) return RESOURCES[shortage].name + '이(가) 부족해요.';
+  return '';
+}
+function copyTradeBundle(bundle) {
+  var out = {};
+  Object.keys(EMPTY_TRADE()).forEach(function(k){ out[k] = (bundle && parseInt(bundle[k])) || 0; });
+  return out;
+}
 var INIT_GROUP = function INIT_GROUP(n) {
   return {
     name: "".concat(n, "\uBAA8\uB460 \uB9C8\uC744"), coins: 25, happyBase: 50,
     resources: { rice: 0, electricity: 0, medical: 0, product: 0, culture: 0 },
     facilities: { farm: 0, factory: 0, power: 0, hospital: 0, school: 0, tourist: 0, market: 0 },
-    lastSubmittedRound: 0, tradeCount: 0
+    lastSubmittedRound: 0, tradeCount: 0, tradeScore: 0, tradePartners: {}, tradeTypes: {}, roundTrades: {}
   };
 };
 var INIT_APP = function INIT_APP() { return { round: 1, groups: {} }; };
@@ -1427,9 +1496,15 @@ function StudentCalc(_ref4) {
   var gIdx = activeGroup;
   var group = gameState.groups[String(gIdx)];
   var _useState13 = useState(EMPTY_ROUND_INPUT()), _useState14 = _slicedToArray(_useState13, 2), ri = _useState14[0], setRi = _useState14[1];
+  var _useStateTrade = useState(EMPTY_TRADE_DRAFTS()), _useStateTrade2 = _slicedToArray(_useStateTrade, 2), tradeDrafts = _useStateTrade2[0], setTradeDrafts = _useStateTrade2[1];
   var _useState15 = useState(false), _useState16 = _slicedToArray(_useState15, 2), showConfirm = _useState16[0], setShowConfirm = _useState16[1];
   var _useState17 = useState(false), _useState18 = _slicedToArray(_useState17, 2), saving = _useState18[0], setSaving = _useState18[1];
   
+  useEffect(function () {
+    setRi(EMPTY_ROUND_INPUT());
+    setTradeDrafts(EMPTY_TRADE_DRAFTS());
+  }, [activeGroup, gameState.round]);
+
   if (!group) return null;
 
   // 🔥 퀘스트 목표 선택 함수
@@ -1498,6 +1573,68 @@ function StudentCalc(_ref4) {
     }));
   };
 
+  var updateTradeDraft = function updateTradeDraft(slotKey, patch) {
+    setTradeDrafts(function (d) {
+      return _objectSpread(_objectSpread({}, d), {}, _defineProperty({}, slotKey, _objectSpread(_objectSpread({}, d[slotKey]), patch)));
+    });
+  };
+  var updateTradeAmount = function updateTradeAmount(slotKey, direction, key, value) {
+    var amount = Math.max(0, parseInt(value) || 0);
+    setTradeDrafts(function (d) {
+      var slot = d[slotKey];
+      var bundle = _objectSpread(_objectSpread({}, slot[direction]), {}, _defineProperty({}, key, amount));
+      return _objectSpread(_objectSpread({}, d), {}, _defineProperty({}, slotKey, _objectSpread(_objectSpread({}, slot), {}, _defineProperty({}, direction, bundle))));
+    });
+  };
+  var handleConfirmTrade = function handleConfirmTrade(slotKey) {
+    var roundTrades = getRoundTrades(group, gameState.round);
+    var designatedPartner = slotKey === 'first' ? getDesignatedPartner(gameState.round, gIdx) : '';
+    var draft = _objectSpread(_objectSpread({}, tradeDrafts[slotKey]), {}, { partner: designatedPartner || tradeDrafts[slotKey].partner });
+    var problem = getTradeProblem(group, gameState.round, slotKey, draft, roundTrades, gIdx);
+    if (problem) {
+      alert(problem);
+      return;
+    }
+    setSaving(true);
+    var cost = getTradeCost(slotKey, group);
+    var scoreInfo = calcTradeScoreInfo(group, gameState.round, slotKey, draft.partner, draft.type);
+    var nextResources = _objectSpread({}, group.resources);
+    Object.keys(RESOURCES).forEach(function (id) {
+      nextResources[id] = (nextResources[id] || 0) + ((draft.tradeIn && draft.tradeIn[id]) || 0) - ((draft.tradeOut && draft.tradeOut[id]) || 0);
+    });
+    var nextCoins = (group.coins || 0) + ((draft.tradeIn && draft.tradeIn.coins) || 0) - ((draft.tradeOut && draft.tradeOut.coins) || 0) - cost;
+    var nextPartners = _objectSpread({}, group.tradePartners || {});
+    nextPartners[String(draft.partner)] = true;
+    var nextTypes = _objectSpread({}, group.tradeTypes || {});
+    nextTypes[draft.type || '물자'] = true;
+    var nextRoundTrades = _objectSpread({}, group.roundTrades || {});
+    var thisRound = _objectSpread({}, nextRoundTrades[String(gameState.round)] || {});
+    thisRound[slotKey] = {
+      confirmed: true,
+      slot: slotKey === 'first' ? 1 : 2,
+      partner: String(draft.partner),
+      type: draft.type || '물자',
+      tradeIn: copyTradeBundle(draft.tradeIn),
+      tradeOut: copyTradeBundle(draft.tradeOut),
+      cost: cost,
+      score: scoreInfo.total
+    };
+    nextRoundTrades[String(gameState.round)] = thisRound;
+    var updatedGroup = _objectSpread(_objectSpread({}, group), {}, {
+      coins: nextCoins,
+      resources: nextResources,
+      tradeCount: (group.tradeCount || 0) + 1,
+      tradeScore: (group.tradeScore || group.tradeCount || 0) + scoreInfo.total,
+      tradePartners: nextPartners,
+      tradeTypes: nextTypes,
+      roundTrades: nextRoundTrades
+    });
+    saveState(_objectSpread(_objectSpread({}, gameState), {}, {
+      groups: _objectSpread(_objectSpread({}, gameState.groups), {}, _defineProperty({}, String(gIdx), updatedGroup))
+    }));
+    setSaving(false);
+  };
+
   if (group.lastSubmittedRound === gameState.round) {
     var isR8Final = gameState.round === 8;
     if (isR8Final && group.selectedGoal) {
@@ -1539,7 +1676,7 @@ function StudentCalc(_ref4) {
     var _ref6 = _slicedToArray(_ref5, 2), id = _ref6[0], cnt = _ref6[1];
     return s + (((_FACILITIES$id = FACILITIES[id]) === null || _FACILITIES$id === void 0 ? void 0 : _FACILITIES$id.cost) || 0) * cnt;
   }, 0);
-  var coinAfterSettle = ((_group$coins = group.coins) !== null && _group$coins !== void 0 ? _group$coins : 15) - buildCost + (ri.tradeIn.coins || 0) - (ri.tradeOut.coins || 0);
+  var coinAfterSettle = ((_group$coins = group.coins) !== null && _group$coins !== void 0 ? _group$coins : 15) - buildCost;
   
   // 2. 이벤트 팝업을 띄울지 결정하는 조건문
   var hasEvent = !!ROUND_EVENTS[String(gameState.round)];
@@ -1550,7 +1687,7 @@ function StudentCalc(_ref4) {
   var executeApply = /*#__PURE__*/function () {
     var _ref7 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee() {
       var _group$happyBase;
-      var nextCoins, nextResources, nextFacilities, nextHappyBase, didTrade, nextTradeCount, runCount, i, riceToEat, updatedGroup, currentHappinessForIncome, roundIncome;
+      var nextCoins, nextResources, nextFacilities, nextHappyBase, runCount, i, riceToEat, updatedGroup, currentHappinessForIncome, roundIncome;
       return _regenerator().w(function (_context) {
         while (1) switch (_context.n) {
           case 0:
@@ -1559,22 +1696,10 @@ function StudentCalc(_ref4) {
             nextResources = _objectSpread({}, group.resources);
             nextFacilities = _objectSpread({}, group.facilities);
             nextHappyBase = (_group$happyBase = group.happyBase) !== null && _group$happyBase !== void 0 ? _group$happyBase : 50;
-            didTrade = Object.values(ri.tradeIn).some(function (v) { return v > 0; }) || Object.values(ri.tradeOut).some(function (v) { return v > 0; });
-            nextTradeCount = (group.tradeCount || 0) + (didTrade ? 1 : 0);
             Object.entries(ri.bought).forEach(function (_ref8) {
               var _ref9 = _slicedToArray(_ref8, 2), id = _ref9[0], cnt = _ref9[1];
               if (cnt > 0) nextFacilities[id] = (nextFacilities[id] || 0) + cnt;
             });
-            Object.entries(ri.tradeIn).forEach(function (_ref0) {
-              var _ref1 = _slicedToArray(_ref0, 2), res = _ref1[0], val = _ref1[1];
-              if (res !== 'coins') nextResources[res] = (nextResources[res] || 0) + val;
-            });
-            Object.entries(ri.tradeOut).forEach(function (_ref10) {
-              var _ref11 = _slicedToArray(_ref10, 2), res = _ref11[0], val = _ref11[1];
-              if (res !== 'coins') nextResources[res] = (nextResources[res] || 0) - val;
-            });
-            
-            if (didTrade && nextFacilities.market > 0) nextCoins += 1;
             
             // 🔥 행복도에 따른 수입 계산 로직 추가
             currentHappinessForIncome = calcHappiness(nextHappyBase, nextFacilities);
@@ -1620,8 +1745,7 @@ function StudentCalc(_ref4) {
               happyBase: nextHappyBase,
               resources: nextResources,
               facilities: nextFacilities,
-              lastSubmittedRound: gameState.round,
-              tradeCount: nextTradeCount
+              lastSubmittedRound: gameState.round
             }); 
             saveState(_objectSpread(_objectSpread({}, gameState), {}, {
               groups: _objectSpread(_objectSpread({}, gameState.groups), {}, _defineProperty({}, String(gIdx), updatedGroup))
@@ -1639,6 +1763,14 @@ function StudentCalc(_ref4) {
   var happiness = calcHappiness(group.happyBase, group.facilities);
   var theme = VILLAGE_THEME[String(gIdx)];
   var currentGoal = VILLAGE_GOALS[group.selectedGoal] || VILLAGE_GOALS['prosperous'];
+  var roundTrades = getRoundTrades(group, gameState.round);
+  var designatedPartner = getDesignatedPartner(gameState.round, gIdx);
+  var firstDraft = _objectSpread(_objectSpread({}, tradeDrafts.first), {}, { partner: designatedPartner || tradeDrafts.first.partner });
+  var secondDraft = tradeDrafts.second;
+  var firstScoreInfo = calcTradeScoreInfo(group, gameState.round, 'first', firstDraft.partner, firstDraft.type);
+  var secondScoreInfo = calcTradeScoreInfo(group, gameState.round, 'second', secondDraft.partner, secondDraft.type);
+  var firstTradeProblem = getTradeProblem(group, gameState.round, 'first', firstDraft, roundTrades, gIdx);
+  var secondTradeProblem = getTradeProblem(group, gameState.round, 'second', secondDraft, roundTrades, gIdx);
   
   return /*#__PURE__*/React.createElement("div", {
     className: "sky-bg",
@@ -1722,20 +1854,39 @@ function StudentCalc(_ref4) {
         return /*#__PURE__*/React.createElement("div", { key: id, className: "fac-row" }, /*#__PURE__*/React.createElement("div", { className: "ic" }, f.icon), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", { className: "nm" }, f.name), /*#__PURE__*/React.createElement("div", { className: "cost" }, "\uD83D\uDCB0 ", f.cost)), /*#__PURE__*/React.createElement("div", { className: "ctr" }, /*#__PURE__*/React.createElement("button", { className: "qbtn minus", disabled: ri.bought[id] === 0, onClick: function onClick() { return setRi(function (r) { return _objectSpread(_objectSpread({}, r), {}, { bought: _objectSpread(_objectSpread({}, r.bought), {}, _defineProperty({}, id, Math.max(0, r.bought[id] - 1))) }); }); } }, "\u2212"), /*#__PURE__*/React.createElement("span", { className: "num" }, ri.bought[id]), /*#__PURE__*/React.createElement("button", { className: "qbtn plus", onClick: function onClick() { return setRi(function (r) { return _objectSpread(_objectSpread({}, r), {}, { bought: _objectSpread(_objectSpread({}, r.bought), {}, _defineProperty({}, id, r.bought[id] + 1)) }); }); } }, "+")));
       })),
       /*#__PURE__*/React.createElement("div", { style: { marginTop: 14, padding: '10px 14px', background: '#FFF8E0', borderRadius: 14, border: '2px dashed #F2C260', fontFamily: 'Gaegu', fontSize: 16, color: '#7A4D0C', textAlign: 'center' } }, "\uD83D\uDD28 \uAC74\uC124\uBE44 \uD569\uACC4 : ", /*#__PURE__*/React.createElement("b", null, buildCost), " \uCF54\uC778")),
-    /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 } },
-      /*#__PURE__*/React.createElement(SectionTitle, { icon: "\uD83E\uDD1D", text: "\uAD50\uB958 \uD611\uC0C1 \uACB0\uACFC", accent: "var(--ocean-deep)", inline: true }),
-      /*#__PURE__*/React.createElement("span", { className: "tag-num" }, "\uD604\uC7AC \uAD50\uB958 \uD69F\uC218: ", group.tradeCount || 0, "\uD68C")),
-    /*#__PURE__*/React.createElement("div", { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 28 } },
-      /*#__PURE__*/React.createElement("div", { className: "trade-panel in" },
-        /*#__PURE__*/React.createElement("div", { style: { fontFamily: 'Jua', fontSize: 16, color: 'var(--in-ink)', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 } }, /*#__PURE__*/React.createElement("span", { style: { background: 'var(--in-ink)', color: 'white', borderRadius: 999, width: 22, height: 22, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 } }, "+"), "\uBC1B\uC740 \uC790\uC6D0 / \uCF54\uC778"), Object.keys(RESOURCES).map(function (id) {
-          return /*#__PURE__*/React.createElement("div", { key: id, className: "trade-row" }, /*#__PURE__*/React.createElement("span", { className: "ic" }, RESOURCES[id].icon), /*#__PURE__*/React.createElement("span", { className: "nm" }, RESOURCES[id].name), /*#__PURE__*/React.createElement("input", { className: "trade-input", type: "number", min: "0", value: ri.tradeIn[id], onChange: function onChange(e) { return setRi(function (r) { return _objectSpread(_objectSpread({}, r), {}, { tradeIn: _objectSpread(_objectSpread({}, r.tradeIn), {}, _defineProperty({}, id, parseInt(e.target.value) || 0)) }); }); } }));
+    isTradeRound(gameState.round) && /*#__PURE__*/React.createElement(React.Fragment, null,
+      /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, flexWrap: 'wrap', gap: 8 } },
+        /*#__PURE__*/React.createElement(SectionTitle, { icon: "\uD83E\uDD1D", text: "\uAD50\uB958 \uD655\uC815", sub: "1\uCC28\uB294 \uAE30\uBCF8, 2\uCC28\uB294 \uC120\uD0DD \uC804\uB7B5", accent: "var(--ocean-deep)", inline: true }),
+        /*#__PURE__*/React.createElement("div", { style: { display:'flex', gap:6, flexWrap:'wrap' } },
+          /*#__PURE__*/React.createElement("span", { className: "tag-num" }, "\uAD50\uB958 ", group.tradeCount || 0, "\uD68C"),
+          /*#__PURE__*/React.createElement("span", { className: "tag-num" }, "\u2B50 \uAD50\uB958 \uC810\uC218 ", group.tradeScore || group.tradeCount || 0, "\uC810"))),
+      /*#__PURE__*/React.createElement("details", { className: "plate-soft", style: { padding: 14, marginBottom: 14, background: '#FFFDF0' }, open: gameState.round === 5 },
+        /*#__PURE__*/React.createElement("summary", { style: { cursor:'pointer', fontFamily:'Jua', fontSize:16, color:'var(--wood-deep)' } }, "\u2B50 \uAD50\uB958\uC655 \uC810\uC218\uB294 \uC774\uB807\uAC8C \uC62C\uB77C\uAC00\uC694!"),
+        /*#__PURE__*/React.createElement("div", { style: { marginTop:10, display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(150px, 1fr))', gap:8, fontFamily:'Gaegu', fontSize:15, color:'var(--ink-soft)' } },
+          /*#__PURE__*/React.createElement("div", null, "\uD83E\uDD1D 1\uCC28 \uC9C0\uC815 \uAD50\uB958: +1\uC810"),
+          /*#__PURE__*/React.createElement("div", null, "\uD83C\uDFAF 2\uCC28 \uC790\uC720 \uAD50\uB958: +2\uC810"),
+          /*#__PURE__*/React.createElement("div", null, "\uD83C\uDF10 \uCC98\uC74C \uAD50\uB958\uD558\uB294 \uB9C8\uC744: +1\uC810"),
+          /*#__PURE__*/React.createElement("div", null, "\uD83C\uDFAD \uCC98\uC74C \uD558\uB294 \uAD50\uB958 \uC885\uB958: +1\uC810"),
+          /*#__PURE__*/React.createElement("div", null, "\uD83D\uDED2 \uC2DC\uC7A5\uC774 \uC788\uC73C\uBA74: +1\uC810"),
+          /*#__PURE__*/React.createElement("div", null, "\u26A0\uFE0F 2\uCC28 \uAD50\uB958 \uBE44\uC6A9: 2\uCF54\uC778 / \uC2DC\uC7A5 \uBCF4\uC720 \uC2DC 1\uCF54\uC778")),
+        /*#__PURE__*/React.createElement("p", { style: { margin:'10px 0 0', fontFamily:'Gaegu', fontSize:15, color:'var(--ink)' } }, "\uAD50\uB958\uC655\uC740 \uB2E8\uC21C\uD788 \uB9CE\uC774 \uAD50\uB958\uD55C \uB9C8\uC744\uC774 \uC544\uB2C8\uB77C, \uC5EC\uB7EC \uB9C8\uC744\uACFC \uB2E4\uC591\uD55C \uBC29\uC2DD\uC73C\uB85C \uC798 \uC5F0\uACB0\uD55C \uB9C8\uC744\uC785\uB2C8\uB2E4!")),
+      /*#__PURE__*/React.createElement("div", { style: { display: 'grid', gridTemplateColumns: '1fr', gap: 14, marginBottom: 28 } },
+        /*#__PURE__*/React.createElement(TradeSlotPanel, {
+          slotKey: "first", title: "\uD83E\uDD1D 1\uCC28 \uC9C0\uC815 \uAD50\uB958", sub: designatedPartner ? "\uC774\uBC88 \uB77C\uC6B4\uB4DC \uC9C0\uC815 \uC0C1\uB300" : "R8\uC740 1\uCC28\uB3C4 \uC790\uC720 \uC120\uD0DD", draft: firstDraft, confirmed: roundTrades.first, scoreInfo: firstScoreInfo, problem: firstTradeProblem,
+          cost: getTradeCost('first', group), partnerOptions: getPartnerOptions(gIdx), designatedPartner: designatedPartner, saving: saving,
+          onPatch: function onPatch(patch) { return updateTradeDraft('first', patch); },
+          onAmount: function onAmount(direction, key, value) { return updateTradeAmount('first', direction, key, value); },
+          onConfirm: function onConfirm() { return handleConfirmTrade('first'); }
         }),
-        /*#__PURE__*/React.createElement("div", { className: "trade-row", style: { marginTop: 6, background: 'rgba(255,255,255,0.6)', borderRadius: 12 } }, /*#__PURE__*/React.createElement("span", { className: "ic" }, "\uD83D\uDCB0"), /*#__PURE__*/React.createElement("span", { className: "nm", style: { fontWeight: 'bold' } }, "\uCF54\uC778"), /*#__PURE__*/React.createElement("input", { className: "trade-input", type: "number", min: "0", value: ri.tradeIn.coins, onChange: function onChange(e) { return setRi(function (r) { return _objectSpread(_objectSpread({}, r), {}, { tradeIn: _objectSpread(_objectSpread({}, r.tradeIn), {}, { coins: parseInt(e.target.value) || 0 }) }); }); } }))),
-      /*#__PURE__*/React.createElement("div", { className: "trade-panel out" },
-        /*#__PURE__*/React.createElement("div", { style: { fontFamily: 'Jua', fontSize: 16, color: 'var(--out-ink)', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 } }, /*#__PURE__*/React.createElement("span", { style: { background: 'var(--out-ink)', color: 'white', borderRadius: 999, width: 22, height: 22, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 } }, "\u2212"), "\uC900 \uC790\uC6D0 / \uCF54\uC778"), Object.keys(RESOURCES).map(function (id) {
-          return /*#__PURE__*/React.createElement("div", { key: id, className: "trade-row" }, /*#__PURE__*/React.createElement("span", { className: "ic" }, RESOURCES[id].icon), /*#__PURE__*/React.createElement("span", { className: "nm" }, RESOURCES[id].name), /*#__PURE__*/React.createElement("input", { className: "trade-input", type: "number", min: "0", value: ri.tradeOut[id], onChange: function onChange(e) { return setRi(function (r) { return _objectSpread(_objectSpread({}, r), {}, { tradeOut: _objectSpread(_objectSpread({}, r.tradeOut), {}, _defineProperty({}, id, parseInt(e.target.value) || 0)) }); }); } }));
-        }),
-        /*#__PURE__*/React.createElement("div", { className: "trade-row", style: { marginTop: 6, background: 'rgba(255,255,255,0.6)', borderRadius: 12 } }, /*#__PURE__*/React.createElement("span", { className: "ic" }, "\uD83D\uDCB0"), /*#__PURE__*/React.createElement("span", { className: "nm", style: { fontWeight: 'bold' } }, "\uCF54\uC778"), /*#__PURE__*/React.createElement("input", { className: "trade-input", type: "number", min: "0", value: ri.tradeOut.coins, onChange: function onChange(e) { return setRi(function (r) { return _objectSpread(_objectSpread({}, r), {}, { tradeOut: _objectSpread(_objectSpread({}, r.tradeOut), {}, { coins: parseInt(e.target.value) || 0 }) }); }); } })))),
+        /*#__PURE__*/React.createElement(TradeSlotPanel, {
+          slotKey: "second", title: "\uD83C\uDFAF 2\uCC28 \uC790\uC720 \uAD50\uB958", sub: "\uD544\uC694\uD560 \uB54C\uB9CC \uC120\uD0DD\uD558\uB294 \uC804\uB7B5 \uAD50\uB958", draft: secondDraft, confirmed: roundTrades.second, scoreInfo: secondScoreInfo, problem: secondTradeProblem,
+          cost: getTradeCost('second', group), partnerOptions: getPartnerOptions(gIdx), designatedPartner: '', saving: saving,
+          onPatch: function onPatch(patch) { return updateTradeDraft('second', patch); },
+          onAmount: function onAmount(direction, key, value) { return updateTradeAmount('second', direction, key, value); },
+          onConfirm: function onConfirm() { return handleConfirmTrade('second'); }
+        }))),
+    !isTradeRound(gameState.round) && /*#__PURE__*/React.createElement("div", { className: "bubble banner-info-blue", style: { marginBottom: 24 } },
+      /*#__PURE__*/React.createElement("div", { style: { fontFamily: 'Gaegu', fontSize: 16, color: 'var(--in-ink)' } }, "\uD83E\uDD1D \uAD50\uB958\uB294 R5\uBD80\uD130 \uC2DC\uC791\uD569\uB2C8\uB2E4. \uC9C0\uAE08\uC740 \uAC74\uBB3C \uAC74\uC124\uACFC \uC790\uC6D0 \uC0DD\uC0B0\uC5D0 \uC9D1\uC911\uD574\uC694!")),
     /*#__PURE__*/React.createElement("button", { onClick: function onClick() { return setShowConfirm(true); }, disabled: settleDisabled, className: "settle-btn" }, saving ? '⏳ 저장 중...' : needsEventPopup ? '⚡ 속보를 먼저 확인해주세요!' : settleDisabled ? '😢 코인이 부족해요!' : "\u2705 \uB77C\uC6B4\uB4DC ".concat(gameState.round, " \uC815\uC0B0 \uD655\uC815\uD558\uAE30")),
     coinAfterSettle < 0 && /*#__PURE__*/React.createElement("p", { style: { fontFamily: 'Gaegu', fontSize: 16, color: 'var(--berry-deep)', textAlign: 'center', marginTop: 10 } }, "\uAC74\uC124\uC744 \uC904\uC774\uAC70\uB098, \uC790\uC6D0\uC744 \uD314\uC544 \uCF54\uC778\uC744 \uB354 \uBC8C\uC5B4\uC640\uC57C \uD574\uC694.")),
   showConfirm && /*#__PURE__*/React.createElement("div", { className: "modal-bg" },
@@ -1799,7 +1950,7 @@ function TeacherBoard(_ref22) {
       return /*#__PURE__*/React.createElement("div", { key: n, className: "tv-card-big tv-".concat(n, " ").concat(isDone ? 'done' : ''), style: isFlashing ? { boxShadow: '0 0 40px rgba(108,255,177,0.8)', border: '2px solid rgba(108,255,177,1)', transition: 'all 0.3s' } : {} },
         isFlashing && /*#__PURE__*/React.createElement("div", { style: { position: 'absolute', top: 8, right: 12, background: '#6CFFB1', color: '#0E1B3D', borderRadius: 999, padding: '3px 12px', fontFamily: 'Jua', fontSize: 13, zIndex: 10 } }, "\uD83D\uDD25 \uBC29\uAE08 \uAC31\uC2E0\uB428!"),
         /*#__PURE__*/React.createElement("div", { className: "group-tag" }, n, "\uBAA8\uB460", isDone && /*#__PURE__*/React.createElement("span", { style: { marginLeft: 5, fontSize: '0.85em' } }, " \u2713")),
-        /*#__PURE__*/React.createElement("div", { className: "tv-card-head" }, /*#__PURE__*/React.createElement("h3", null, VILLAGE_THEME[String(n)].roof, " ", g.name), /*#__PURE__*/React.createElement("span", { className: "trade-tag" }, "\uD83E\uDD1D \uAD50\uB958 ", g.tradeCount || 0, "\uD68C")),
+        /*#__PURE__*/React.createElement("div", { className: "tv-card-head" }, /*#__PURE__*/React.createElement("h3", null, VILLAGE_THEME[String(n)].roof, " ", g.name), /*#__PURE__*/React.createElement("span", { className: "trade-tag" }, "\uD83E\uDD1D \uAD50\uB958 ", g.tradeCount || 0, "\uD68C · \u2B50", g.tradeScore || g.tradeCount || 0, "\uC810")),
         g.selectedGoal && VILLAGE_GOALS[g.selectedGoal] && /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,228,94,0.12)', border: '1.5px solid rgba(255,228,94,0.4)', borderRadius: 10, padding: '4px 10px' } },
           /*#__PURE__*/React.createElement("span", { style: { fontFamily: 'Jua', fontSize: 'clamp(10px,1.3vh,13px)', color: 'var(--neon-yellow)' } }, "\uD83C\uDFAF \uBAA9\uD45C:"),
           /*#__PURE__*/React.createElement("span", { style: { fontFamily: 'Jua', fontSize: 'clamp(10px,1.3vh,13px)', color: 'white' } }, VILLAGE_GOALS[g.selectedGoal].title)),
@@ -1832,6 +1983,72 @@ function TeacherBoard(_ref22) {
 function SectionTitle(_ref25) {
   var icon = _ref25.icon, text = _ref25.text, sub = _ref25.sub, accent = _ref25.accent, inline = _ref25.inline;
   return /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: inline ? 0 : 12 } }, /*#__PURE__*/React.createElement("span", { style: { fontFamily: 'Jua', fontSize: 22, color: accent || 'var(--ink)' } }, icon, " ", text), sub && /*#__PURE__*/React.createElement("span", { style: { fontFamily: 'Gaegu', fontSize: 15, color: 'var(--ink-soft)' } }, sub));
+}
+
+function TradeSlotPanel(props) {
+  var slotKey = props.slotKey, title = props.title, sub = props.sub, draft = props.draft, confirmed = props.confirmed, scoreInfo = props.scoreInfo, problem = props.problem, cost = props.cost, partnerOptions = props.partnerOptions, designatedPartner = props.designatedPartner, saving = props.saving, onPatch = props.onPatch, onAmount = props.onAmount, onConfirm = props.onConfirm;
+  var isConfirmed = confirmed && confirmed.confirmed;
+  var disabled = !!problem || saving || isConfirmed;
+  var panelStyle = { padding: 16, background: slotKey === 'first' ? '#F8FCFF' : '#FFFDF0', border: slotKey === 'first' ? '3px solid var(--in-border)' : '3px solid #F2C260', marginBottom: 0 };
+  var renderBundle = function renderBundle(direction, label, cls, color) {
+    return /*#__PURE__*/React.createElement("div", { className: "trade-panel ".concat(cls), style: { boxShadow: 'none' } },
+      /*#__PURE__*/React.createElement("div", { style: { fontFamily: 'Jua', fontSize: 15, color: color, marginBottom: 8 } }, label),
+      Object.keys(RESOURCES).map(function(id) {
+        return /*#__PURE__*/React.createElement("div", { key: id, className: "trade-row" },
+          /*#__PURE__*/React.createElement("span", { className: "ic" }, RESOURCES[id].icon),
+          /*#__PURE__*/React.createElement("span", { className: "nm" }, RESOURCES[id].name),
+          /*#__PURE__*/React.createElement("input", { className: "trade-input", type: "number", min: "0", value: (draft[direction] && draft[direction][id]) || 0, disabled: isConfirmed, onChange: function onChange(e) { return onAmount(direction, id, e.target.value); } }));
+      }),
+      /*#__PURE__*/React.createElement("div", { className: "trade-row", style: { marginTop: 6, background: 'rgba(255,255,255,0.6)', borderRadius: 12 } },
+        /*#__PURE__*/React.createElement("span", { className: "ic" }, "\uD83D\uDCB0"),
+        /*#__PURE__*/React.createElement("span", { className: "nm", style: { fontWeight: 'bold' } }, "\uCF54\uC778"),
+        /*#__PURE__*/React.createElement("input", { className: "trade-input", type: "number", min: "0", value: (draft[direction] && draft[direction].coins) || 0, disabled: isConfirmed, onChange: function onChange(e) { return onAmount(direction, 'coins', e.target.value); } }))
+    );
+  };
+  var header = /*#__PURE__*/React.createElement("div", { style: { display:'flex', justifyContent:'space-between', alignItems:'center', gap:10, marginBottom:10, flexWrap:'wrap' } },
+    /*#__PURE__*/React.createElement("div", null,
+      /*#__PURE__*/React.createElement("div", { style: { fontFamily:'Jua', fontSize:19, color:'var(--ink)' } }, title),
+      sub && /*#__PURE__*/React.createElement("div", { style: { fontFamily:'Gaegu', fontSize:14, color:'var(--ink-soft)', marginTop:2 } }, sub)),
+    isConfirmed ? /*#__PURE__*/React.createElement("span", { className: "tag-num", style: { background:'#DFF5F1', color:'#2E6B4F' } }, "\u2705 \uD655\uC815 \uC644\uB8CC · +", confirmed.score || 0, "\uC810") : /*#__PURE__*/React.createElement("span", { className: "tag-num", style: { background:'#FFF1B4' } }, "\uC608\uC0C1 +", scoreInfo.total, "\uC810")
+  );
+  var body;
+  if (isConfirmed) {
+    body = /*#__PURE__*/React.createElement("div", { style: { background:'white', border:'2px dashed #B6E8DC', borderRadius:14, padding:12, fontFamily:'Gaegu', fontSize:16, color:'var(--ink)' } },
+      "\uC0C1\uB300: ", confirmed.partner, "\uBAA8\uB460 · \uC885\uB958: ", confirmed.type, " · \uBE44\uC6A9: ", confirmed.cost || 0, "\uCF54\uC778",
+      /*#__PURE__*/React.createElement("br", null), "\uAD50\uB958 \uC810\uC218 +", confirmed.score || 0, "\uC810\uC774 TV\uC5D0 \uBC18\uC601\uB410\uC5B4\uC694.");
+  } else {
+    var partnerInput = designatedPartner ? /*#__PURE__*/React.createElement("div", { style: { marginTop:6, padding:'9px 12px', background:'white', border:'2px solid var(--wood-light)', borderRadius:12 } }, designatedPartner, "\uBAA8\uB460") : /*#__PURE__*/React.createElement("select", { value: draft.partner || '', onChange: function onChange(e) { return onPatch({ partner: e.target.value }); }, style: { marginTop:6, width:'100%', height:40, borderRadius:12, border:'2px solid var(--wood-light)', fontFamily:'Jua', padding:'0 10px', background:'white', color:'var(--ink)' } },
+      /*#__PURE__*/React.createElement("option", { value: "" }, "\uC120\uD0DD"),
+      partnerOptions.map(function(p){ return /*#__PURE__*/React.createElement("option", { key:p, value:p }, p, "\uBAA8\uB460"); })
+    );
+    var typeInput = /*#__PURE__*/React.createElement("select", { value: draft.type || '물자', onChange: function onChange(e) { return onPatch({ type: e.target.value }); }, style: { marginTop:6, width:'100%', height:40, borderRadius:12, border:'2px solid var(--wood-light)', fontFamily:'Jua', padding:'0 10px', background:'white', color:'var(--ink)' } },
+      TRADE_TYPES.map(function(t){ return /*#__PURE__*/React.createElement("option", { key:t, value:t }, t); })
+    );
+    var scoreBox = /*#__PURE__*/React.createElement("div", { style: { background:'white', border:'2px dashed #F2D9A8', borderRadius:14, padding:'10px 12px', fontFamily:'Gaegu', fontSize:15, color:'var(--ink)' } },
+      "\uC608\uC0C1 \uC810\uC218: \uAE30\uBCF8 +", scoreInfo.base,
+      scoreInfo.newPartner ? " · \uC0C8 \uC0C1\uB300 +1" : "",
+      scoreInfo.newType ? " · \uC0C8 \uC885\uB958 +1" : "",
+      scoreInfo.market ? " · \uC2DC\uC7A5 +1" : "",
+      " = ", /*#__PURE__*/React.createElement("b", { style: { color:'var(--berry-deep)' } }, "+", scoreInfo.total, "\uC810"),
+      cost > 0 && /*#__PURE__*/React.createElement("div", { style: { marginTop:4, color:'#7A4D0C' } }, "\uD83D\uDCB0 2\uCC28 \uAD50\uB958 \uBE44\uC6A9: ", cost, "\uCF54\uC778"),
+      problem && /*#__PURE__*/React.createElement("div", { style: { marginTop:4, color:'var(--berry-deep)' } }, "\u26A0\uFE0F ", problem)
+    );
+    body = /*#__PURE__*/React.createElement(React.Fragment, null,
+      /*#__PURE__*/React.createElement("div", { style: { display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginBottom:12 } },
+        /*#__PURE__*/React.createElement("label", { style: { fontFamily:'Jua', fontSize:14, color:'var(--ink)' } }, "\uC0C1\uB300 \uB9C8\uC744", partnerInput),
+        /*#__PURE__*/React.createElement("label", { style: { fontFamily:'Jua', fontSize:14, color:'var(--ink)' } }, "\uAD50\uB958 \uC885\uB958", typeInput)
+      ),
+      /*#__PURE__*/React.createElement("div", { style: { display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, marginBottom:12 } },
+        renderBundle('tradeIn', "\u2B05\uFE0F \uC6B0\uB9AC\uAC00 \uBC1B\uC744 \uAC83", 'in', 'var(--in-ink)'),
+        renderBundle('tradeOut', "\u27A1\uFE0F \uC6B0\uB9AC\uAC00 \uC904 \uAC83", 'out', 'var(--out-ink)')
+      ),
+      /*#__PURE__*/React.createElement("div", { style: { display:'grid', gridTemplateColumns:'1fr auto', gap:10, alignItems:'center' } },
+        scoreBox,
+        /*#__PURE__*/React.createElement("button", { className: disabled ? "btn3d muted" : "btn3d green", disabled: disabled, onClick: onConfirm, style: { fontSize:17, padding:'12px 16px', whiteSpace:'nowrap' } }, saving ? "\uC800\uC7A5 \uC911..." : "\uAD50\uB958 \uD655\uC815")
+      )
+    );
+  }
+  return /*#__PURE__*/React.createElement("div", { className: "plate-soft", style: panelStyle }, header, body);
 }
 function UseResourceCard(_ref26) {
   var emoji = _ref26.emoji, label = _ref26.label, effect = _ref26.effect, stock = _ref26.stock, onClick = _ref26.onClick, available = _ref26.available, theme = _ref26.theme;
