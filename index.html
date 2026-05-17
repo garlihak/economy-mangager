@@ -1430,6 +1430,13 @@ function StartScreen(_ref3) {
   var _useState_lg = useState(function(){ try { return localStorage.getItem('village_locked_group'); } catch(e){ return null; } });
   var _useState_lg2 = _slicedToArray(_useState_lg, 2), lockedGroup = _useState_lg2[0], setLockedGroup = _useState_lg2[1];
   var _useState_ul = useState(false), _useState_ul2 = _slicedToArray(_useState_ul, 2), showUnlockModal = _useState_ul2[0], setShowUnlockModal = _useState_ul2[1];
+  var _useState_upw = useState(''), _useState_upw2 = _slicedToArray(_useState_upw, 2), unlockPwValue = _useState_upw2[0], setUnlockPwValue = _useState_upw2[1];
+  var _useState_upe = useState(false), _useState_upe2 = _slicedToArray(_useState_upe, 2), unlockPwError = _useState_upe2[0], setUnlockPwError = _useState_upe2[1];
+  var _useState_upsh = useState(false), _useState_upsh2 = _slicedToArray(_useState_upsh, 2), unlockPwShake = _useState_upsh2[0], setUnlockPwShake = _useState_upsh2[1];
+
+  var openUnlockModal = function() {
+    setUnlockPwValue(''); setUnlockPwError(false); setUnlockPwShake(false); setShowUnlockModal(true);
+  };
 
   var enterGroup = function(n) {
     var newGroups = _objectSpread({}, groups);
@@ -1443,8 +1450,13 @@ function StartScreen(_ref3) {
     setMode('student');
   };
   var handleUnlock = function() {
-    try { localStorage.removeItem('village_locked_group'); } catch(e){}
-    setLockedGroup(null); setShowUnlockModal(false);
+    if (unlockPwValue === '0402') {
+      try { localStorage.removeItem('village_locked_group'); } catch(e){}
+      setLockedGroup(null); setShowUnlockModal(false); setUnlockPwValue(''); setUnlockPwError(false);
+    } else {
+      setUnlockPwError(true); setUnlockPwShake(true); setUnlockPwValue('');
+      setTimeout(function(){ setUnlockPwShake(false); setUnlockPwError(false); }, 700);
+    }
   };
 
   return /*#__PURE__*/React.createElement(React.Fragment, null,
@@ -1485,24 +1497,31 @@ function StartScreen(_ref3) {
                 !g && !isLocked && /*#__PURE__*/React.createElement("div", { className: "mini" }, /*#__PURE__*/React.createElement("span", null, "\uC0C8 \uB9C8\uC744 \uC2DC\uC791 \u2192")));
             })),
           lockedGroup && /*#__PURE__*/React.createElement("div", { style: { textAlign:'center', marginTop:18 } },
-            /*#__PURE__*/React.createElement("button", { onClick: function(){ setShowUnlockModal(true); },
+            /*#__PURE__*/React.createElement("button", { onClick: openUnlockModal,
               style: { background:'none', border:'none', fontFamily:'Gaegu', fontSize:16, color:'var(--ink-soft)', textDecoration:'underline', cursor:'pointer' } },
               "\uD83D\uDD12 \uD604\uC7AC ", lockedGroup, "\uBAA8\uB460 \uC804\uC6A9 \uAE30\uAE30\uC785\uB2C8\uB2E4 (\uD074\uB9AD \uC2DC \uACE0\uC815 \uD574\uC81C)")),
           /*#__PURE__*/React.createElement("div", { style: { marginTop: 28, paddingTop: 22, borderTop: '2px dashed #F2D9A8' } },
             /*#__PURE__*/React.createElement("button", { onClick: openTeacher, className: "btn3d navy", style: { width: '100%', fontSize: 20 } }, "\uD83D\uDCFA \uC120\uC0DD\uB2D8 \uB300\uC2DC\uBCF4\uB4DC (\uAD50\uC2E4 TV\uC6A9)"),
             /*#__PURE__*/React.createElement("p", { style: { fontFamily: 'Gaegu', fontSize: 16, color: 'var(--ink-soft)', margin: '10px 0 0' } }, "4\uBAA8\uB460 \uD604\uD669\uC744 \uD55C\uB208\uC5D0 \u2014 \uD559\uC0DD\uC774 \uC785\uB825\uD558\uBA74 \uC790\uB3D9\uC73C\uB85C \uBC18\uC601\uB429\uB2C8\uB2E4 \uD83D\uDD25"))),
         /*#__PURE__*/React.createElement("p", { style: { fontFamily: 'Gaegu', fontSize: 16, color: 'var(--ink-soft)', marginTop: 28 } }, "\uD83C\uDF1F \uC790\uC6D0\uC744 \uBAA8\uC73C\uACE0, \uC2DC\uC124\uC744 \uC9D3\uACE0, \uC774\uC6C3 \uB9C8\uC744\uACFC \uAD50\uB958\uD558\uBA70 \uC6B0\uB9AC \uBAA8\uB460 \uBAA9\uD45C\uB97C \uB2EC\uC131\uD558\uC790!"))),
-    showUnlockModal && /*#__PURE__*/React.createElement("div", { className: "modal-bg" },
-      /*#__PURE__*/React.createElement("div", { className: "modal" },
-        /*#__PURE__*/React.createElement("div", { style: { fontSize:52, marginBottom:6 } }, "\uD83D\uDD13"),
-        /*#__PURE__*/React.createElement("h3", { style: { fontFamily:'Jua', fontSize:24, margin:'0 0 8px', color:'var(--ink)' } }, "\uBAA8\uB460 \uACE0\uC815 \uD574\uC81C"),
-        /*#__PURE__*/React.createElement("p", { style: { fontFamily:'Gaegu', fontSize:17, color:'var(--ink-soft)', lineHeight:1.5, margin:'0 0 22px' } },
-          "\uD604\uC7AC \uC774 \uAE30\uAE30\uB294 ", /*#__PURE__*/React.createElement("b", { style: { color:'var(--berry-deep)' } }, lockedGroup, "\uBAA8\uB460"),
-          " \uC804\uC6A9\uC785\uB2C8\uB2E4.", /*#__PURE__*/React.createElement("br", null),
-          "\uACE0\uC815\uC744 \uD574\uC81C\uD558\uBA74 \uBAA8\uB4E0 \uBAA8\uB460\uC5D0 \uB2E4\uC2DC \uC811\uC18D\uD560 \uC218 \uC788\uAC8C \uB429\uB2C8\uB2E4."),
+    showUnlockModal && /*#__PURE__*/React.createElement("div", { className: "modal-bg", onClick: function(e){ if(e.target===e.currentTarget) setShowUnlockModal(false); } },
+      /*#__PURE__*/React.createElement("div", { className: "modal", style: { animation: unlockPwShake ? 'shake 0.35s ease' : 'none' } },
+        /*#__PURE__*/React.createElement("div", { style: { fontSize:52, marginBottom:6 } }, "🔐"),
+        /*#__PURE__*/React.createElement("h3", { style: { fontFamily:'Jua', fontSize:24, margin:'0 0 8px', color:'var(--ink)' } }, "모둠 고정 해제"),
+        /*#__PURE__*/React.createElement("p", { style: { fontFamily:'Gaegu', fontSize:17, color:'var(--ink-soft)', lineHeight:1.5, margin:'0 0 16px' } },
+          "현재 이 기기는 ", /*#__PURE__*/React.createElement("b", { style: { color:'var(--berry-deep)' } }, lockedGroup, "모둠"),
+          " 전용입니다.", /*#__PURE__*/React.createElement("br", null),
+          "고정을 해제하려면 선생님 비밀번호를 입력하세요."),
+        /*#__PURE__*/React.createElement("input", { type: "password", value: unlockPwValue,
+          onChange: function(e){ setUnlockPwValue(e.target.value); setUnlockPwError(false); },
+          onKeyDown: function(e){ if(e.key==='Enter') handleUnlock(); },
+          autoFocus: true, placeholder: "••••",
+          style: { width:'100%', height:52, borderRadius:16, border: unlockPwError?'3px solid #E8645A':'3px solid var(--wood-light)', background: unlockPwError?'#FFF0EE':'white', textAlign:'center', fontFamily:'Jua', fontSize:28, color:'var(--ink)', outline:'none', letterSpacing:8, boxSizing:'border-box', marginBottom:8 } }),
+        unlockPwError && /*#__PURE__*/React.createElement("p", { style: { fontFamily:'Gaegu', fontSize:15, color:'#E8645A', margin:'0 0 14px' } }, "❌ 비밀번호가 맞지 않아요."),
+        !unlockPwError && /*#__PURE__*/React.createElement("div", { style: { height:22, marginBottom:14 } }),
         /*#__PURE__*/React.createElement("div", { style: { display:'flex', gap:12 } },
-          /*#__PURE__*/React.createElement("button", { onClick: function(){ setShowUnlockModal(false); }, className: "btn3d muted", style: { flex:1, fontSize:17 } }, "\uCDE8\uC18C"),
-          /*#__PURE__*/React.createElement("button", { onClick: handleUnlock, className: "btn3d red", style: { flex:1, fontSize:17 } }, "\uD574\uC81C \uD655\uC778")))));
+          /*#__PURE__*/React.createElement("button", { onClick: function(){ setShowUnlockModal(false); }, className: "btn3d muted", style: { flex:1, fontSize:17 } }, "취소"),
+          /*#__PURE__*/React.createElement("button", { onClick: handleUnlock, className: "btn3d red", style: { flex:1, fontSize:17 } }, "해제 확인")))));
 }
 
 // ─────────────────────────────────────────────────────────────
