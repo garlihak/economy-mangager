@@ -813,23 +813,23 @@ input { font-family: inherit; }
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
-  gap: clamp(10px, 1.6vh, 22px) clamp(10px, 1vw, 18px);
-  margin-top: clamp(4px, 0.6vh, 8px); /* group-tag 카드 내부 배치로 여백 축소 */
+  gap: clamp(6px, 1vh, 14px) clamp(8px, 0.8vw, 14px);
+  margin-top: clamp(2px, 0.4vh, 6px);
 }
 
 .tv-card-big {
   position: relative;
   background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%);
   border: 2px solid rgba(255,255,255,0.20);
-  border-radius: clamp(14px, 1.6vh, 22px);
-  padding: clamp(12px, 1.8vh, 22px) clamp(14px, 1.4vw, 22px);
+  border-radius: clamp(12px, 1.4vh, 18px);
+  padding: clamp(8px, 1.2vh, 16px) clamp(10px, 1.2vw, 18px);
   backdrop-filter: blur(8px);
   display: flex;
   flex-direction: column;
   min-height: 0;
   min-width: 0;
-  gap: clamp(8px, 1.2vh, 14px);
-  overflow: visible;
+  gap: clamp(4px, 0.7vh, 9px);
+  overflow: hidden;
 }
 .tv-card-big.done {
   border-color: rgba(108,255,177,0.7);
@@ -897,8 +897,8 @@ input { font-family: inherit; }
 .tv-stat-big {
   background: rgba(0,0,0,0.32);
   border: 2px solid rgba(255,255,255,0.18);
-  border-radius: clamp(10px, 1.4vh, 16px);
-  padding: clamp(6px, 1vh, 12px) clamp(8px, 1vw, 14px);
+  border-radius: clamp(8px, 1.2vh, 14px);
+  padding: clamp(4px, 0.7vh, 9px) clamp(6px, 0.8vw, 12px);
   text-align: center;
   min-width: 0;
 }
@@ -911,23 +911,23 @@ input { font-family: inherit; }
 }
 .tv-stat-big .val {
   font-family: 'Jua', sans-serif;
-  font-size: clamp(26px, 4.2vh, 44px);
+  font-size: clamp(22px, 3.4vh, 36px);
   line-height: 1;
 }
 
 .tv-resources-big {
-  flex: 1 1 0;
+  flex: 0 0 auto;
   min-height: 0;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: clamp(6px, 0.8vw, 10px);
+  gap: clamp(4px, 0.6vw, 8px);
   margin: 0;
 }
 .tv-resource-big {
   background: rgba(0,0,0,0.30);
   border: 2px solid rgba(255,255,255,0.14);
-  border-radius: clamp(8px, 1.2vh, 12px);
-  padding: clamp(6px, 1vh, 10px) 4px;
+  border-radius: clamp(6px, 1vh, 10px);
+  padding: clamp(4px, 0.7vh, 8px) 4px;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -939,13 +939,13 @@ input { font-family: inherit; }
   overflow: hidden;
 }
 .tv-resource-big .ic {
-  font-size: clamp(20px, 3.4vh, 34px);
+  font-size: clamp(16px, 2.6vh, 26px);
   line-height: 1;
   filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4));
 }
 .tv-resource-big .v {
   font-family: 'Jua', sans-serif;
-  font-size: clamp(20px, 3.4vh, 34px);
+  font-size: clamp(16px, 2.6vh, 26px);
   color: white;
   line-height: 1;
   text-shadow: 0 0 12px rgba(255,255,255,0.25);
@@ -1098,13 +1098,13 @@ var DB_PATH = 'village_economy_v1';
 //  게임 데이터 상수
 // ─────────────────────────────────────────────────────────────
 var FACILITIES = {
-  farm: { icon: '🌾', name: '논', cost: 3, prod: { rice: 3 }, happy: 0 },
-  factory: { icon: '🏭', name: '공장', cost: 5, prod: { product: 2 }, happy: 0 },
-  power: { icon: '⚡', name: '발전소', cost: 6, prod: { electricity: 4 }, happy: 0 },
-  hospital: { icon: '🏥', name: '병원', cost: 5, prod: { medical: 2 }, happy: 5 },
-  school: { icon: '🏫', name: '학교', cost: 4, prod: {}, happy: 3 },
-  tourist: { icon: '🎭', name: '관광지', cost: 4, prod: { culture: 2 }, happy: 5 },
-  market: { icon: '🛒', name: '시장', cost: 3, prod: {}, happy: 2 }
+  farm: { icon: '🌾', name: '논', cost: 3, prod: { rice: 3 }, happy: 0, desc: '매 라운드 쌀 +3 생산' },
+  factory: { icon: '🏭', name: '공장', cost: 5, prod: { product: 2 }, happy: 0, desc: '전기 소모 → 제품 +2 생산' },
+  power: { icon: '⚡', name: '발전소', cost: 6, prod: { electricity: 4 }, happy: 0, desc: '매 라운드 전기 +4 생산' },
+  hospital: { icon: '🏥', name: '병원', cost: 5, prod: { medical: 2 }, happy: 5, desc: '행복 +5 · 전염병 피해 경감' },
+  school: { icon: '🏫', name: '학교', cost: 4, prod: {}, happy: 3, desc: '행복 +3 · R5 교류 보너스' },
+  tourist: { icon: '🎭', name: '관광지', cost: 4, prod: { culture: 2 }, happy: 5, desc: '행복 +5 · 문화 +2 생산' },
+  market: { icon: '🛒', name: '시장', cost: 3, prod: {}, happy: 2, desc: '행복 +2 · 2차 교류 비용 절감' }
 };
 var RESOURCES = {
   rice: { icon: '🌾', name: '쌀', desc: '매 라운드 2소비' },
@@ -1116,7 +1116,7 @@ var RESOURCES = {
 var ROUND_EVENTS = {
   '3': { name: '🌧️ 가뭄 발생', desc: '이번 라운드 쌀 생산량이 30% 감소합니다. 쌀이 부족해지지 않도록 주의하세요!' },
   '4': { name: '🦠 전염병 경보', desc: '마을의 기본 행복지수가 -10 감소합니다. 병원이 있으면 -5로 경감! 의료 자원으로 치료하세요!' },
-  '5': { name: '🤝 교류 개방의 날', desc: '학교가 있는 마을은 행복 +5 보너스! 이번 라운드부터 이웃 마을과 교류를 시작해요.' },
+  '5': { name: '🤝 기술 교류 제안', desc: '학교가 있는 마을은 행복 +5 보너스! 이번 라운드 교류를 1회 무료로 할 수 있어요.' },
   '6': { name: '🎭 문화 축제 개최', desc: '관광지가 있는 마을은 행복 +5, 코인 +3 보너스!' },
   '7': { name: '🏅 품질 인증 획득', desc: '논이 2개 이상인 마을은 코인 +5 보너스! 농업 마을의 역습!' },
   '8': { name: '🌊 홍수 피해', desc: '정산 시 쌀이 2개 추가로 유실됩니다. 쌀이 충분한 마을과 교류하면 위기를 넘길 수 있어요!' }
@@ -1127,7 +1127,7 @@ var ROUND_QUESTIONS = {
   '3': '가뭄이 왔을 때 우리 마을 쌀이 부족했다면, 어떻게 해결할 수 있을까?',
   '4': '전염병 위기를 교류 없이 해결할 방법이 있어? 왜 교류가 필요할까?',
   '5': '어느 마을과 교류하는 게 가장 합리적인 선택이야? 근거는?',
-  '6': '교류 후 수치로 뭐가 달라졌어? 물자 교류와 문화 교류는 어떻게 달라?',
+  '6': '교류 후 수치로 뭐가 달라졌어? 물자·기술·문화 교류는 어떻게 달라?',
   '7': '교류 횟수와 행복지수 사이에 어떤 관계가 보여? 근거는?',
   '8': '교류가 없었다면 우리 마을은 지금 어떻게 됐을까? 데이터로 설명해봐.'
 };
@@ -1144,9 +1144,9 @@ var VILLAGE_THEME = {
 var VILLAGE_GOALS = {
   prosperous: {
     title: "😊 풍요로운 마을",
-    condition: "행복지수 높은 마을",
+    condition: "행복×코인 점수 1위",
     desc: "주민들이 매일매일 웃어요!",
-    tip: "🏥병원, 🏫학교, 🎭관광지를 짓고 의료/문화 자원을 즉시 사용해 보세요!"
+    tip: "🏥병원, 🏫학교, 🎭관광지를 짓고 의료/문화 자원을 즉시 사용해 보세요! 코인도 함께 벌어야 해요!"
   },
   exchange: {
     title: "🤝 교류왕 마을",
@@ -1167,19 +1167,95 @@ var VILLAGE_GOALS = {
     tip: "🌾논, ⚡발전소, 🏭공장을 많이 짓고 효율적으로 자원을 생산해 보세요!"
   }
 };
+
+// ─── 특별 미션 (R7~R8 적용) ───────────────────────────────────
+var SPECIAL_MISSIONS = {
+  production: {
+    icon: '🚜',
+    title: '최종 자원 150 달성!',
+    desc: 'R8 정산 후 창고 총 자원이 150 이상이어야 해요.',
+    hint: ['⚡ 전기가 남아있으면 공장을 풀가동! 제품도 창고 자원에 포함돼요.', '🌾 R8 홍수로 쌀이 -4 추가 소비돼요. 미리 충분히 비축해두세요!', '🤝 교류로 자원을 받아오는 것도 창고 총량에 포함됩니다. 적극 요청해보세요!'],
+    target: 150,
+    unit: '',
+    getValue: function(g) {
+      return Object.values(g.resources || {}).reduce(function(s,v){ return s+(v||0); }, 0);
+    }
+  },
+  prosperous: {
+    icon: '😊',
+    title: '행복×코인 점수 2500!',
+    desc: 'R8 정산 후 (행복지수 × 코인) 점수가 2500 이상이어야 해요.',
+    hint: ['💡 행복이 높아도 코인이 적으면 점수가 낮아요! 코인을 적극적으로 벌어야 해요.', '🏭 남는 제품을 수출하면 코인 +2, 이웃 마을에 의료·문화를 팔아도 코인이 들어와요!', '😊 의료·문화 자원을 즉시 사용해 행복을 계속 높이면 곱하기 효과가 커져요.'],
+    target: 2500,
+    unit: '점',
+    getValue: function(g) {
+      var h = calcHappiness(g.happyBase, g.facilities);
+      return h * (g.coins || 0);
+    }
+  },
+  exchange: {
+    icon: '🤝',
+    title: 'R7·R8 문화 교류 각 1회!',
+    desc: 'R7과 R8 각각에 문화 교류를 1회 이상 포함해야 해요.',
+    hint: ['🎭 문화 교류 = 문화 자원을 주거나 받는 교류예요. 코인만 주고받으면 문화 교류가 아니에요!', '🎭 관광지가 있으면 매 라운드 문화 자원이 생산돼요. 없다면 이웃에게 요청해보세요.', '💡 1차 지정 교류에서 문화를 포함하면 기본 점수 +1 보너스도 챙길 수 있어요!'],
+    target: 2,
+    unit: '회',
+    getValue: function(g) {
+      var rt = g.roundTrades || {};
+      var count = 0;
+      [7,8].forEach(function(r) {
+        var rd = rt[String(r)] || {};
+        var hasCulture = Object.values(rd).some(function(slot) {
+          return slot && slot.confirmed && slot.types && slot.types.indexOf('문화') >= 0;
+        });
+        if (hasCulture) count++;
+      });
+      return count;
+    }
+  },
+  rich: {
+    icon: '💰',
+    title: '최종 코인 65 달성!',
+    desc: 'R8 정산 후 코인이 65 이상이어야 해요.',
+    hint: ['🏅 R7 품질인증 이벤트: 논이 2개 이상이면 코인 +5 보너스가 자동으로 들어와요!', '🏭 제품 수출 코인 +2, 이웃 마을에 의료·쌀 등을 팔아서 코인으로 받아오세요!', '💡 2차 교류 비용은 2코인(시장 있으면 1코인). 코인을 받는 교류를 전략적으로 활용하세요!'],
+    target: 65,
+    unit: '코인',
+    getValue: function(g) { return g.coins || 0; }
+  }
+};
+
+function calcSpecialMission(group) {
+  if (!group || !group.selectedGoal) return null;
+  var m = SPECIAL_MISSIONS[group.selectedGoal];
+  if (!m) return null;
+  var current = m.getValue(group);
+  return { current: current, target: m.target, done: current >= m.target, icon: m.icon, title: m.title, desc: m.desc, unit: m.unit };
+}
+
 function calcGoalResults(groups) {
   var entries = [1,2,3,4].map(function(n) {
     var g = groups[String(n)];
     if (!g) return null;
     var happy = calcHappiness(g.happyBase, g.facilities);
     var totalRes = Object.values(g.resources || {}).reduce(function(s,v){ return s+(v||0); }, 0);
-    return { n:n, happy:happy, tradeCount:g.tradeCount||0, tradeScore:(g.tradeScore||g.tradeCount||0), coins:g.coins||0, totalRes:totalRes, selectedGoal:g.selectedGoal };
+    var happyCoinScore = happy * (g.coins || 0);
+    var tradeScore = g.tradeScore || g.tradeCount || 0;
+    return { n:n, happy:happy, tradeCount:g.tradeCount||0, tradeScore:tradeScore, coins:g.coins||0, totalRes:totalRes, happyCoinScore:happyCoinScore, selectedGoal:g.selectedGoal };
   }).filter(Boolean);
   function winners(key) {
     var max = Math.max.apply(null, entries.map(function(e){ return e[key]; }));
     return entries.filter(function(e){ return e[key]===max; }).map(function(e){ return e.n; });
   }
-  return { prosperous:winners('happy'), exchange:winners('tradeScore'), rich:winners('coins'), production:winners('totalRes') };
+  function specialWinners(goalKey) {
+    var keyMap = { prosperous:'happyCoinScore', exchange:'tradeScore', rich:'coins', production:'totalRes' };
+    return winners(keyMap[goalKey] || 'coins');
+  }
+  return {
+    prosperous: specialWinners('prosperous'),
+    exchange: specialWinners('exchange'),
+    rich: specialWinners('rich'),
+    production: specialWinners('production')
+  };
 }
 
 var EMPTY_BOUGHT = function EMPTY_BOUGHT() { return Object.fromEntries(Object.keys(FACILITIES).map(function (k) { return [k, 0]; })); };
@@ -1209,13 +1285,13 @@ function tradeHasValue(slot) {
   if (!slot) return false;
   var tIn = slot.tradeIn || EMPTY_TRADE();
   var tOut = slot.tradeOut || EMPTY_TRADE();
-  return Object.values(tIn).some(function(v){ return (parseInt(v) || 0) > 0; }) || Object.values(tOut).some(function(v){ return (parseInt(v) || 0) > 0; });
+  return Object.values(tIn).some(function(v){ return (parseInt(v)||0)>0; }) || Object.values(tOut).some(function(v){ return (parseInt(v)||0)>0; });
 }
 function getTradeCategories(slot) {
   var tIn = slot && slot.tradeIn ? slot.tradeIn : EMPTY_TRADE();
   var tOut = slot && slot.tradeOut ? slot.tradeOut : EMPTY_TRADE();
-  var hasMaterial = TRADE_MATERIAL_KEYS.some(function(k) { return ((parseInt(tIn[k]) || 0) > 0) || ((parseInt(tOut[k]) || 0) > 0); });
-  var hasCulture = ((parseInt(tIn.culture) || 0) > 0) || ((parseInt(tOut.culture) || 0) > 0);
+  var hasMaterial = TRADE_MATERIAL_KEYS.some(function(k){ return ((parseInt(tIn[k])||0)>0)||((parseInt(tOut[k])||0)>0); });
+  var hasCulture = ((parseInt(tIn.culture)||0)>0)||((parseInt(tOut.culture)||0)>0);
   var labels = [];
   if (hasMaterial) labels.push('물자');
   if (hasCulture) labels.push('문화');
@@ -1225,9 +1301,7 @@ function getTradeTypeLabel(slot) {
   var labels = getTradeCategories(slot);
   return labels.length ? labels.join(' + ') : '입력 전';
 }
-function tradeIncludesCulture(slot) {
-  return getTradeCategories(slot).indexOf('문화') >= 0;
-}
+function tradeIncludesCulture(slot) { return getTradeCategories(slot).indexOf('문화') >= 0; }
 function getTradeCost(slotKey, group) {
   if (slotKey !== 'second') return 0;
   return group && group.facilities && group.facilities.market > 0 ? 1 : 2;
@@ -1239,14 +1313,7 @@ function calcTradeScoreInfo(group, round, slotKey, partner, draft) {
   var hasCulture = tradeIncludesCulture(draft);
   var isFirstCulture = hasCulture && !(group && group.tradeTypes && group.tradeTypes['문화']);
   var marketBonus = group && group.facilities && group.facilities.market > 0 ? 1 : 0;
-  return {
-    base: base,
-    newPartner: isNewPartner ? 1 : 0,
-    cultureFirst: isFirstCulture ? 1 : 0,
-    market: marketBonus,
-    typeLabel: getTradeTypeLabel(draft),
-    total: base + (isNewPartner ? 1 : 0) + (isFirstCulture ? 1 : 0) + marketBonus
-  };
+  return { base:base, newPartner:isNewPartner?1:0, cultureFirst:isFirstCulture?1:0, market:marketBonus, typeLabel:getTradeTypeLabel(draft), total:base+(isNewPartner?1:0)+(isFirstCulture?1:0)+marketBonus };
 }
 function getTradeProblem(group, round, slotKey, draft, roundTrades, gIdx) {
   if (!isTradeRound(round)) return '교류는 R5부터 시작합니다.';
@@ -1263,13 +1330,13 @@ function getTradeProblem(group, round, slotKey, draft, roundTrades, gIdx) {
   var tradeOutCoins = (draft.tradeOut && draft.tradeOut.coins) || 0;
   if (coins + tradeInCoins - tradeOutCoins - cost < 0) return '코인이 부족해요.';
   var resources = group.resources || {};
-  var shortage = Object.keys(RESOURCES).find(function(id){ return ((draft.tradeOut && draft.tradeOut[id]) || 0) > (resources[id] || 0); });
+  var shortage = Object.keys(RESOURCES).find(function(id){ return ((draft.tradeOut && draft.tradeOut[id])||0)>(resources[id]||0); });
   if (shortage) return RESOURCES[shortage].name + '이(가) 부족해요.';
   return '';
 }
 function copyTradeBundle(bundle) {
   var out = {};
-  Object.keys(EMPTY_TRADE()).forEach(function(k){ out[k] = (bundle && parseInt(bundle[k])) || 0; });
+  Object.keys(EMPTY_TRADE()).forEach(function(k){ out[k] = (bundle && parseInt(bundle[k]))||0; });
   return out;
 }
 var INIT_GROUP = function INIT_GROUP(n) {
@@ -1277,7 +1344,7 @@ var INIT_GROUP = function INIT_GROUP(n) {
     name: "".concat(n, "\uBAA8\uB460 \uB9C8\uC744"), coins: 25, happyBase: 50,
     resources: { rice: 0, electricity: 0, medical: 0, product: 0, culture: 0 },
     facilities: { farm: 0, factory: 0, power: 0, hospital: 0, school: 0, tourist: 0, market: 0 },
-    lastSubmittedRound: 0, tradeCount: 0, tradeScore: 0, tradePartners: {}, tradeTypes: {}, roundTrades: {}
+    lastSubmittedRound: 0, tradeCount: 0
   };
 };
 var INIT_APP = function INIT_APP() { return { round: 1, groups: {} }; };
@@ -1288,7 +1355,7 @@ function calcHappiness(happyBase, facilities) {
     if (!FACILITIES[id]) return sum;
     return sum + FACILITIES[id].happy * cnt;
   }, 0);
-  return Math.max(0, Math.min(100, (happyBase !== null && happyBase !== void 0 ? happyBase : 50) + facHappy));
+  return Math.max(0, (happyBase !== null && happyBase !== void 0 ? happyBase : 50) + facHappy);
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -1430,13 +1497,6 @@ function StartScreen(_ref3) {
   var _useState_lg = useState(function(){ try { return localStorage.getItem('village_locked_group'); } catch(e){ return null; } });
   var _useState_lg2 = _slicedToArray(_useState_lg, 2), lockedGroup = _useState_lg2[0], setLockedGroup = _useState_lg2[1];
   var _useState_ul = useState(false), _useState_ul2 = _slicedToArray(_useState_ul, 2), showUnlockModal = _useState_ul2[0], setShowUnlockModal = _useState_ul2[1];
-  var _useState_upw = useState(''), _useState_upw2 = _slicedToArray(_useState_upw, 2), unlockPwValue = _useState_upw2[0], setUnlockPwValue = _useState_upw2[1];
-  var _useState_upe = useState(false), _useState_upe2 = _slicedToArray(_useState_upe, 2), unlockPwError = _useState_upe2[0], setUnlockPwError = _useState_upe2[1];
-  var _useState_upsh = useState(false), _useState_upsh2 = _slicedToArray(_useState_upsh, 2), unlockPwShake = _useState_upsh2[0], setUnlockPwShake = _useState_upsh2[1];
-
-  var openUnlockModal = function() {
-    setUnlockPwValue(''); setUnlockPwError(false); setUnlockPwShake(false); setShowUnlockModal(true);
-  };
 
   var enterGroup = function(n) {
     var newGroups = _objectSpread({}, groups);
@@ -1450,13 +1510,8 @@ function StartScreen(_ref3) {
     setMode('student');
   };
   var handleUnlock = function() {
-    if (unlockPwValue === '0402') {
-      try { localStorage.removeItem('village_locked_group'); } catch(e){}
-      setLockedGroup(null); setShowUnlockModal(false); setUnlockPwValue(''); setUnlockPwError(false);
-    } else {
-      setUnlockPwError(true); setUnlockPwShake(true); setUnlockPwValue('');
-      setTimeout(function(){ setUnlockPwShake(false); setUnlockPwError(false); }, 700);
-    }
+    try { localStorage.removeItem('village_locked_group'); } catch(e){}
+    setLockedGroup(null); setShowUnlockModal(false);
   };
 
   return /*#__PURE__*/React.createElement(React.Fragment, null,
@@ -1497,31 +1552,24 @@ function StartScreen(_ref3) {
                 !g && !isLocked && /*#__PURE__*/React.createElement("div", { className: "mini" }, /*#__PURE__*/React.createElement("span", null, "\uC0C8 \uB9C8\uC744 \uC2DC\uC791 \u2192")));
             })),
           lockedGroup && /*#__PURE__*/React.createElement("div", { style: { textAlign:'center', marginTop:18 } },
-            /*#__PURE__*/React.createElement("button", { onClick: openUnlockModal,
+            /*#__PURE__*/React.createElement("button", { onClick: function(){ setShowUnlockModal(true); },
               style: { background:'none', border:'none', fontFamily:'Gaegu', fontSize:16, color:'var(--ink-soft)', textDecoration:'underline', cursor:'pointer' } },
               "\uD83D\uDD12 \uD604\uC7AC ", lockedGroup, "\uBAA8\uB460 \uC804\uC6A9 \uAE30\uAE30\uC785\uB2C8\uB2E4 (\uD074\uB9AD \uC2DC \uACE0\uC815 \uD574\uC81C)")),
           /*#__PURE__*/React.createElement("div", { style: { marginTop: 28, paddingTop: 22, borderTop: '2px dashed #F2D9A8' } },
             /*#__PURE__*/React.createElement("button", { onClick: openTeacher, className: "btn3d navy", style: { width: '100%', fontSize: 20 } }, "\uD83D\uDCFA \uC120\uC0DD\uB2D8 \uB300\uC2DC\uBCF4\uB4DC (\uAD50\uC2E4 TV\uC6A9)"),
             /*#__PURE__*/React.createElement("p", { style: { fontFamily: 'Gaegu', fontSize: 16, color: 'var(--ink-soft)', margin: '10px 0 0' } }, "4\uBAA8\uB460 \uD604\uD669\uC744 \uD55C\uB208\uC5D0 \u2014 \uD559\uC0DD\uC774 \uC785\uB825\uD558\uBA74 \uC790\uB3D9\uC73C\uB85C \uBC18\uC601\uB429\uB2C8\uB2E4 \uD83D\uDD25"))),
         /*#__PURE__*/React.createElement("p", { style: { fontFamily: 'Gaegu', fontSize: 16, color: 'var(--ink-soft)', marginTop: 28 } }, "\uD83C\uDF1F \uC790\uC6D0\uC744 \uBAA8\uC73C\uACE0, \uC2DC\uC124\uC744 \uC9D3\uACE0, \uC774\uC6C3 \uB9C8\uC744\uACFC \uAD50\uB958\uD558\uBA70 \uC6B0\uB9AC \uBAA8\uB460 \uBAA9\uD45C\uB97C \uB2EC\uC131\uD558\uC790!"))),
-    showUnlockModal && /*#__PURE__*/React.createElement("div", { className: "modal-bg", onClick: function(e){ if(e.target===e.currentTarget) setShowUnlockModal(false); } },
-      /*#__PURE__*/React.createElement("div", { className: "modal", style: { animation: unlockPwShake ? 'shake 0.35s ease' : 'none' } },
-        /*#__PURE__*/React.createElement("div", { style: { fontSize:52, marginBottom:6 } }, "🔐"),
-        /*#__PURE__*/React.createElement("h3", { style: { fontFamily:'Jua', fontSize:24, margin:'0 0 8px', color:'var(--ink)' } }, "모둠 고정 해제"),
-        /*#__PURE__*/React.createElement("p", { style: { fontFamily:'Gaegu', fontSize:17, color:'var(--ink-soft)', lineHeight:1.5, margin:'0 0 16px' } },
-          "현재 이 기기는 ", /*#__PURE__*/React.createElement("b", { style: { color:'var(--berry-deep)' } }, lockedGroup, "모둠"),
-          " 전용입니다.", /*#__PURE__*/React.createElement("br", null),
-          "고정을 해제하려면 선생님 비밀번호를 입력하세요."),
-        /*#__PURE__*/React.createElement("input", { type: "password", value: unlockPwValue,
-          onChange: function(e){ setUnlockPwValue(e.target.value); setUnlockPwError(false); },
-          onKeyDown: function(e){ if(e.key==='Enter') handleUnlock(); },
-          autoFocus: true, placeholder: "••••",
-          style: { width:'100%', height:52, borderRadius:16, border: unlockPwError?'3px solid #E8645A':'3px solid var(--wood-light)', background: unlockPwError?'#FFF0EE':'white', textAlign:'center', fontFamily:'Jua', fontSize:28, color:'var(--ink)', outline:'none', letterSpacing:8, boxSizing:'border-box', marginBottom:8 } }),
-        unlockPwError && /*#__PURE__*/React.createElement("p", { style: { fontFamily:'Gaegu', fontSize:15, color:'#E8645A', margin:'0 0 14px' } }, "❌ 비밀번호가 맞지 않아요."),
-        !unlockPwError && /*#__PURE__*/React.createElement("div", { style: { height:22, marginBottom:14 } }),
+    showUnlockModal && /*#__PURE__*/React.createElement("div", { className: "modal-bg" },
+      /*#__PURE__*/React.createElement("div", { className: "modal" },
+        /*#__PURE__*/React.createElement("div", { style: { fontSize:52, marginBottom:6 } }, "\uD83D\uDD13"),
+        /*#__PURE__*/React.createElement("h3", { style: { fontFamily:'Jua', fontSize:24, margin:'0 0 8px', color:'var(--ink)' } }, "\uBAA8\uB460 \uACE0\uC815 \uD574\uC81C"),
+        /*#__PURE__*/React.createElement("p", { style: { fontFamily:'Gaegu', fontSize:17, color:'var(--ink-soft)', lineHeight:1.5, margin:'0 0 22px' } },
+          "\uD604\uC7AC \uC774 \uAE30\uAE30\uB294 ", /*#__PURE__*/React.createElement("b", { style: { color:'var(--berry-deep)' } }, lockedGroup, "\uBAA8\uB460"),
+          " \uC804\uC6A9\uC785\uB2C8\uB2E4.", /*#__PURE__*/React.createElement("br", null),
+          "\uACE0\uC815\uC744 \uD574\uC81C\uD558\uBA74 \uBAA8\uB4E0 \uBAA8\uB460\uC5D0 \uB2E4\uC2DC \uC811\uC18D\uD560 \uC218 \uC788\uAC8C \uB429\uB2C8\uB2E4."),
         /*#__PURE__*/React.createElement("div", { style: { display:'flex', gap:12 } },
-          /*#__PURE__*/React.createElement("button", { onClick: function(){ setShowUnlockModal(false); }, className: "btn3d muted", style: { flex:1, fontSize:17 } }, "취소"),
-          /*#__PURE__*/React.createElement("button", { onClick: handleUnlock, className: "btn3d red", style: { flex:1, fontSize:17 } }, "해제 확인")))));
+          /*#__PURE__*/React.createElement("button", { onClick: function(){ setShowUnlockModal(false); }, className: "btn3d muted", style: { flex:1, fontSize:17 } }, "\uCDE8\uC18C"),
+          /*#__PURE__*/React.createElement("button", { onClick: handleUnlock, className: "btn3d red", style: { flex:1, fontSize:17 } }, "\uD574\uC81C \uD655\uC778")))));
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -1536,10 +1584,12 @@ function StudentCalc(_ref4) {
   var _useStateTrade = useState(EMPTY_TRADE_DRAFTS()), _useStateTrade2 = _slicedToArray(_useStateTrade, 2), tradeDrafts = _useStateTrade2[0], setTradeDrafts = _useStateTrade2[1];
   var _useState15 = useState(false), _useState16 = _slicedToArray(_useState15, 2), showConfirm = _useState16[0], setShowConfirm = _useState16[1];
   var _useState17 = useState(false), _useState18 = _slicedToArray(_useState17, 2), saving = _useState18[0], setSaving = _useState18[1];
-  
+  var _useState_sm = useState(false), _useState_sm2 = _slicedToArray(_useState_sm, 2), specialMissionSeen = _useState_sm2[0], setSpecialMissionSeen = _useState_sm2[1];
+
   useEffect(function () {
     setRi(EMPTY_ROUND_INPUT());
     setTradeDrafts(EMPTY_TRADE_DRAFTS());
+    setSpecialMissionSeen(false);
   }, [activeGroup, gameState.round]);
 
   if (!group) return null;
@@ -1578,9 +1628,9 @@ function StudentCalc(_ref4) {
       var penalty = updatedGroup.facilities && updatedGroup.facilities.hospital > 0 ? 5 : 10;
       updatedGroup.happyBase = Math.max(0, (updatedGroup.happyBase || 50) - penalty);
     } else if (r === 5 && updatedGroup.facilities && updatedGroup.facilities.school > 0) {
-      updatedGroup.happyBase = Math.min(100, (updatedGroup.happyBase || 50) + 5);
+      updatedGroup.happyBase = (updatedGroup.happyBase || 50) + 5;
     } else if (r === 6 && updatedGroup.facilities && updatedGroup.facilities.tourist > 0) {
-      updatedGroup.happyBase = Math.min(100, (updatedGroup.happyBase || 50) + 5);
+      updatedGroup.happyBase = (updatedGroup.happyBase || 50) + 5;
       updatedGroup.coins = (updatedGroup.coins || 0) + 3;
     } else if (r === 7 && updatedGroup.facilities && updatedGroup.facilities.farm >= 2) {
       updatedGroup.coins = (updatedGroup.coins || 0) + 5;
@@ -1597,10 +1647,10 @@ function StudentCalc(_ref4) {
     var updatedGroup = _objectSpread({}, group);
     if (type === 'medical' && updatedGroup.resources.medical >= 1) {
       updatedGroup.resources.medical -= 1;
-      updatedGroup.happyBase = Math.min(100, updatedGroup.happyBase + 5);
+      updatedGroup.happyBase = updatedGroup.happyBase + 5;
     } else if (type === 'culture' && updatedGroup.resources.culture >= 1) {
       updatedGroup.resources.culture -= 1;
-      updatedGroup.happyBase = Math.min(100, updatedGroup.happyBase + 3);
+      updatedGroup.happyBase = updatedGroup.happyBase + 3;
     } else if (type === 'product' && updatedGroup.resources.product >= 1) {
       updatedGroup.resources.product -= 1;
       updatedGroup.coins += 2;
@@ -1608,71 +1658,6 @@ function StudentCalc(_ref4) {
     saveState(_objectSpread(_objectSpread({}, gameState), {}, {
       groups: _objectSpread(_objectSpread({}, gameState.groups), {}, _defineProperty({}, String(gIdx), updatedGroup))
     }));
-  };
-
-  var updateTradeDraft = function updateTradeDraft(slotKey, patch) {
-    setTradeDrafts(function (d) {
-      return _objectSpread(_objectSpread({}, d), {}, _defineProperty({}, slotKey, _objectSpread(_objectSpread({}, d[slotKey]), patch)));
-    });
-  };
-  var updateTradeAmount = function updateTradeAmount(slotKey, direction, key, value) {
-    var amount = Math.max(0, parseInt(value) || 0);
-    setTradeDrafts(function (d) {
-      var slot = d[slotKey];
-      var bundle = _objectSpread(_objectSpread({}, slot[direction]), {}, _defineProperty({}, key, amount));
-      return _objectSpread(_objectSpread({}, d), {}, _defineProperty({}, slotKey, _objectSpread(_objectSpread({}, slot), {}, _defineProperty({}, direction, bundle))));
-    });
-  };
-  var handleConfirmTrade = function handleConfirmTrade(slotKey) {
-    var roundTrades = getRoundTrades(group, gameState.round);
-    var designatedPartner = slotKey === 'first' ? getDesignatedPartner(gameState.round, gIdx) : '';
-    var draft = _objectSpread(_objectSpread({}, tradeDrafts[slotKey]), {}, { partner: designatedPartner || tradeDrafts[slotKey].partner });
-    var problem = getTradeProblem(group, gameState.round, slotKey, draft, roundTrades, gIdx);
-    if (problem) {
-      alert(problem);
-      return;
-    }
-    setSaving(true);
-    var cost = getTradeCost(slotKey, group);
-    var scoreInfo = calcTradeScoreInfo(group, gameState.round, slotKey, draft.partner, draft);
-    var nextResources = _objectSpread({}, group.resources);
-    Object.keys(RESOURCES).forEach(function (id) {
-      nextResources[id] = (nextResources[id] || 0) + ((draft.tradeIn && draft.tradeIn[id]) || 0) - ((draft.tradeOut && draft.tradeOut[id]) || 0);
-    });
-    var nextCoins = (group.coins || 0) + ((draft.tradeIn && draft.tradeIn.coins) || 0) - ((draft.tradeOut && draft.tradeOut.coins) || 0) - cost;
-    var nextPartners = _objectSpread({}, group.tradePartners || {});
-    nextPartners[String(draft.partner)] = true;
-    var nextTypes = _objectSpread({}, group.tradeTypes || {});
-    var tradeCategories = getTradeCategories(draft);
-    var tradeTypeLabel = getTradeTypeLabel(draft);
-    if (tradeCategories.indexOf('문화') >= 0) nextTypes['문화'] = true;
-    var nextRoundTrades = _objectSpread({}, group.roundTrades || {});
-    var thisRound = _objectSpread({}, nextRoundTrades[String(gameState.round)] || {});
-    thisRound[slotKey] = {
-      confirmed: true,
-      slot: slotKey === 'first' ? 1 : 2,
-      partner: String(draft.partner),
-      type: tradeTypeLabel,
-      types: tradeCategories,
-      tradeIn: copyTradeBundle(draft.tradeIn),
-      tradeOut: copyTradeBundle(draft.tradeOut),
-      cost: cost,
-      score: scoreInfo.total
-    };
-    nextRoundTrades[String(gameState.round)] = thisRound;
-    var updatedGroup = _objectSpread(_objectSpread({}, group), {}, {
-      coins: nextCoins,
-      resources: nextResources,
-      tradeCount: (group.tradeCount || 0) + 1,
-      tradeScore: (group.tradeScore || group.tradeCount || 0) + scoreInfo.total,
-      tradePartners: nextPartners,
-      tradeTypes: nextTypes,
-      roundTrades: nextRoundTrades
-    });
-    saveState(_objectSpread(_objectSpread({}, gameState), {}, {
-      groups: _objectSpread(_objectSpread({}, gameState.groups), {}, _defineProperty({}, String(gIdx), updatedGroup))
-    }));
-    setSaving(false);
   };
 
   if (group.lastSubmittedRound === gameState.round) {
@@ -1684,15 +1669,24 @@ function StudentCalc(_ref4) {
       var winners = goalResults[myGoal] || [];
       var isWinner = winners.includes(parseInt(gIdx));
       var goalInfo = VILLAGE_GOALS[myGoal];
+      var smFinal = calcSpecialMission(group);
+      var smDone = smFinal && smFinal.done;
+      var totalWin = isWinner && smDone;
       return /*#__PURE__*/React.createElement("div", { className: "sky-bg", style: { minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', padding:24 } },
-        /*#__PURE__*/React.createElement("div", { className: "plate", style: { maxWidth:420, width:'100%', textAlign:'center', padding:'40px 28px' } },
-          /*#__PURE__*/React.createElement("div", { style: { fontSize:80, marginBottom:8, animation:'float-y 2.5s ease-in-out infinite' } }, "\uD83C\uDF85"),
-          /*#__PURE__*/React.createElement("h2", { style: { fontFamily:'Jua', fontSize:28, color:'var(--leaf-deep)', margin:'0 0 18px' } }, "\uD83C\uDF8A \uCD5C\uC885 \uC815\uC0B0 \uC644\uB8CC!"),
-          /*#__PURE__*/React.createElement("div", { style: { marginBottom:22, padding:'18px 20px', borderRadius:20, border: isWinner?'3px solid #4F8A2E':'3px dashed #C68A4F', background: isWinner?'linear-gradient(180deg,#E8F8EC,#C8F0D0)':'linear-gradient(180deg,#FFF8E0,#FFE9B0)', textAlign:'center' } },
-            /*#__PURE__*/React.createElement("div", { style: { fontSize:50, marginBottom:6 } }, isWinner?'\uD83C\uDFC6':'\uD83D\uDE22'),
-            /*#__PURE__*/React.createElement("div", { style: { fontFamily:'Jua', fontSize:20, color: isWinner?'#2E6B4F':'#7A4D0C', marginBottom:4 } }, isWinner?'\uD83C\uDF89 \uBAA9\uD45C \uB2EC\uC131! '+goalInfo.title:'\uBAA9\uD45C\uB97C \uB2EC\uC131\uD558\uC9C0 \uBABB\uD588\uC5B4\uC694'),
-            /*#__PURE__*/React.createElement("div", { style: { fontFamily:'Gaegu', fontSize:15, color: isWinner?'#3A7A50':'#8A6B4F', lineHeight:1.5 } }, isWinner?'\uC6B0\uB9AC \uB9C8\uC744\uC774 '+goalInfo.condition+' 1\uC704\uC608\uC694! \uD83E\uDD73':'\uC6B0\uB9AC\uAC00 \uC815\uD55C \uBAA9\uD45C: '+goalInfo.title),
-            !isWinner && /*#__PURE__*/React.createElement("div", { style: { fontFamily:'Gaegu', fontSize:13, color:'#C68A4F', marginTop:4 } }, '1\uC704 \uBAA8\uB460: '+(goalResults[myGoal]||[]).map(function(n){ return n+'\uBAA8\uB460'; }).join(', '))),
+        /*#__PURE__*/React.createElement("div", { className: "plate", style: { maxWidth:440, width:'100%', textAlign:'center', padding:'40px 28px' } },
+          /*#__PURE__*/React.createElement("div", { style: { fontSize:80, marginBottom:8, animation:'float-y 2.5s ease-in-out infinite' } }, totalWin ? '\uD83C\uDF86' : '\uD83C\uDF85'),
+          /*#__PURE__*/React.createElement("h2", { style: { fontFamily:'Jua', fontSize:28, color:'var(--leaf-deep)', margin:'0 0 14px' } }, "\uD83C\uDF8A \uCD5C\uC885 \uC815\uC0B0 \uC644\uB8CC!"),
+          /*#__PURE__*/React.createElement("div", { style: { marginBottom:12, padding:'16px 18px', borderRadius:20, border: isWinner?'3px solid #4F8A2E':'3px dashed #C68A4F', background: isWinner?'linear-gradient(180deg,#E8F8EC,#C8F0D0)':'linear-gradient(180deg,#FFF8E0,#FFE9B0)', textAlign:'center' } },
+            /*#__PURE__*/React.createElement("div", { style: { fontFamily:'Jua', fontSize:14, color: isWinner?'#4F8A2E':'#8A6B4F', marginBottom:4 } }, "\uD83C\uDFAF \uBA54\uC778 \uBAA9\uD45C"),
+            /*#__PURE__*/React.createElement("div", { style: { fontSize:40, marginBottom:4 } }, isWinner?'\uD83C\uDFC6':'\uD83D\uDE22'),
+            /*#__PURE__*/React.createElement("div", { style: { fontFamily:'Jua', fontSize:19, color: isWinner?'#2E6B4F':'#7A4D0C', marginBottom:4 } }, isWinner?'\uD83C\uDF89 '+goalInfo.title+' 1\uC704!':'\uBAA9\uD45C \uB2EC\uC131 \uBBAB\uD568'),
+            !isWinner && /*#__PURE__*/React.createElement("div", { style: { fontFamily:'Gaegu', fontSize:13, color:'#C68A4F' } }, '1\uC704: '+(goalResults[myGoal]||[]).map(function(n){ return n+'\uBAA8\uB460'; }).join(', '))),
+          smFinal && /*#__PURE__*/React.createElement("div", { style: { marginBottom:16, padding:'14px 16px', borderRadius:18, border: smDone?'3px solid #B57D14':'3px dashed #C68A4F', background: smDone?'linear-gradient(180deg,#FFF8E0,#FFE9B0)':'linear-gradient(180deg,#F8F8F8,#EEE)', textAlign:'center' } },
+            /*#__PURE__*/React.createElement("div", { style: { fontFamily:'Jua', fontSize:14, color: smDone?'#B57D14':'#8A6B4F', marginBottom:4 } }, "\uD83D\uDEA9 \uD2B9\uBCC4 \uBBF8\uC158"),
+            /*#__PURE__*/React.createElement("div", { style: { fontSize:36, marginBottom:4 } }, smDone?'\uD83C\uDFC5':'\uD83D\uDC94'),
+            /*#__PURE__*/React.createElement("div", { style: { fontFamily:'Jua', fontSize:17, color: smDone?'#7A4D0C':'#8A6B4F' } }, smFinal.icon, " ", smFinal.title),
+            /*#__PURE__*/React.createElement("div", { style: { fontFamily:'Gaegu', fontSize:14, color: smDone?'#2E6B4F':'#B83C30', marginTop:4 } }, smFinal.current, smFinal.unit, " / \uBAA9\uD45C ", smFinal.target, smFinal.unit, smDone?' \u2705 \uB2EC\uC131!':' \uBBF8\uB2EC\uC131')),
+          totalWin && /*#__PURE__*/React.createElement("div", { style: { marginBottom:14, padding:'12px 16px', borderRadius:14, background:'linear-gradient(180deg,rgba(108,255,177,0.2),rgba(108,255,177,0.1))', border:'2px solid rgba(108,255,177,0.7)', fontFamily:'Jua', fontSize:18, color:'#2E6B4F' } }, "\uD83C\uDF86 \uBA54\uC778 \uBAA9\uD45C + \uD2B9\uBCC4 \uBBF8\uC158 \uBAA8\uB450 \uB2EC\uC131! \uC644\uBCBD \uD074\uB9AC\uC5B4!"),
           /*#__PURE__*/React.createElement("button", { onClick: function(){ setMode('start'); }, className: "btn3d green", style: { width:'100%' } }, "\uD83C\uDFE0 \uBA54\uC778\uC73C\uB85C \uB3CC\uC544\uAC00\uAE30")));
     }
     return /*#__PURE__*/React.createElement("div", { className: "sky-bg", style: { minHeight:'100vh', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:24 } },
@@ -1717,17 +1711,62 @@ function StudentCalc(_ref4) {
     return s + (((_FACILITIES$id = FACILITIES[id]) === null || _FACILITIES$id === void 0 ? void 0 : _FACILITIES$id.cost) || 0) * cnt;
   }, 0);
   var coinAfterSettle = ((_group$coins = group.coins) !== null && _group$coins !== void 0 ? _group$coins : 15) - buildCost;
-  
+
+  var updateTradeDraft = function updateTradeDraft(slotKey, patch) {
+    setTradeDrafts(function(d) { return _objectSpread(_objectSpread({}, d), {}, _defineProperty({}, slotKey, _objectSpread(_objectSpread({}, d[slotKey]), patch))); });
+  };
+  var updateTradeAmount = function updateTradeAmount(slotKey, direction, key, value) {
+    var amount = Math.max(0, parseInt(value) || 0);
+    setTradeDrafts(function(d) {
+      var slot = d[slotKey];
+      var bundle = _objectSpread(_objectSpread({}, slot[direction]), {}, _defineProperty({}, key, amount));
+      return _objectSpread(_objectSpread({}, d), {}, _defineProperty({}, slotKey, _objectSpread(_objectSpread({}, slot), {}, _defineProperty({}, direction, bundle))));
+    });
+  };
+  var handleConfirmTrade = function handleConfirmTrade(slotKey) {
+    var roundTrades = getRoundTrades(group, gameState.round);
+    var designatedPartner = slotKey === 'first' ? getDesignatedPartner(gameState.round, gIdx) : '';
+    var draft = _objectSpread(_objectSpread({}, tradeDrafts[slotKey]), {}, { partner: designatedPartner || tradeDrafts[slotKey].partner });
+    var problem = getTradeProblem(group, gameState.round, slotKey, draft, roundTrades, gIdx);
+    if (problem) { alert(problem); return; }
+    setSaving(true);
+    var cost = getTradeCost(slotKey, group);
+    var scoreInfo = calcTradeScoreInfo(group, gameState.round, slotKey, draft.partner, draft);
+    var nextResources = _objectSpread({}, group.resources);
+    Object.keys(RESOURCES).forEach(function(id) {
+      nextResources[id] = (nextResources[id]||0) + ((draft.tradeIn&&draft.tradeIn[id])||0) - ((draft.tradeOut&&draft.tradeOut[id])||0);
+    });
+    var nextCoins = (group.coins||0) + ((draft.tradeIn&&draft.tradeIn.coins)||0) - ((draft.tradeOut&&draft.tradeOut.coins)||0) - cost;
+    var nextPartners = _objectSpread({}, group.tradePartners||{});
+    nextPartners[String(draft.partner)] = true;
+    var nextTypes = _objectSpread({}, group.tradeTypes||{});
+    var tradeCategories = getTradeCategories(draft);
+    var tradeTypeLabel = getTradeTypeLabel(draft);
+    if (tradeCategories.indexOf('문화') >= 0) nextTypes['문화'] = true;
+    var nextRoundTrades = _objectSpread({}, group.roundTrades||{});
+    var thisRound = _objectSpread({}, nextRoundTrades[String(gameState.round)]||{});
+    thisRound[slotKey] = { confirmed:true, slot:slotKey==='first'?1:2, partner:String(draft.partner), type:tradeTypeLabel, types:tradeCategories, tradeIn:copyTradeBundle(draft.tradeIn), tradeOut:copyTradeBundle(draft.tradeOut), cost:cost, score:scoreInfo.total };
+    nextRoundTrades[String(gameState.round)] = thisRound;
+    var updatedGroup = _objectSpread(_objectSpread({}, group), {}, { coins:nextCoins, resources:nextResources, tradeCount:(group.tradeCount||0)+1, tradeScore:(group.tradeScore||group.tradeCount||0)+scoreInfo.total, tradePartners:nextPartners, tradeTypes:nextTypes, roundTrades:nextRoundTrades });
+    saveState(_objectSpread(_objectSpread({}, gameState), {}, { groups: _objectSpread(_objectSpread({}, gameState.groups), {}, _defineProperty({}, String(gIdx), updatedGroup)) }));
+    setSaving(false);
+  };
+
   // 2. 이벤트 팝업을 띄울지 결정하는 조건문
   var hasEvent = !!ROUND_EVENTS[String(gameState.round)];
   var isEventApplied = group.eventAppliedRound === gameState.round;
   var needsEventPopup = hasEvent && !isEventApplied;
   var settleDisabled = coinAfterSettle < 0 || saving || needsEventPopup;
 
+  // 3. 특별 미션 팝업 조건 (R7부터 첫 진입 시 1회만)
+  var isSpecialMissionRound = gameState.round >= 7;
+  var needsSpecialMissionPopup = isSpecialMissionRound && !specialMissionSeen && !needsEventPopup;
+  var specialMissionInfo = calcSpecialMission(group);
+
   var executeApply = /*#__PURE__*/function () {
     var _ref7 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee() {
       var _group$happyBase;
-      var nextCoins, nextResources, nextFacilities, nextHappyBase, runCount, i, riceToEat, updatedGroup, currentHappinessForIncome, roundIncome;
+      var nextCoins, nextResources, nextFacilities, nextHappyBase, didTrade, nextTradeCount, runCount, i, riceToEat, updatedGroup, currentHappinessForIncome, roundIncome;
       return _regenerator().w(function (_context) {
         while (1) switch (_context.n) {
           case 0:
@@ -1736,10 +1775,22 @@ function StudentCalc(_ref4) {
             nextResources = _objectSpread({}, group.resources);
             nextFacilities = _objectSpread({}, group.facilities);
             nextHappyBase = (_group$happyBase = group.happyBase) !== null && _group$happyBase !== void 0 ? _group$happyBase : 50;
+            didTrade = Object.values(ri.tradeIn).some(function (v) { return v > 0; }) || Object.values(ri.tradeOut).some(function (v) { return v > 0; });
+            nextTradeCount = (group.tradeCount || 0) + (didTrade ? 1 : 0);
             Object.entries(ri.bought).forEach(function (_ref8) {
               var _ref9 = _slicedToArray(_ref8, 2), id = _ref9[0], cnt = _ref9[1];
               if (cnt > 0) nextFacilities[id] = (nextFacilities[id] || 0) + cnt;
             });
+            Object.entries(ri.tradeIn).forEach(function (_ref0) {
+              var _ref1 = _slicedToArray(_ref0, 2), res = _ref1[0], val = _ref1[1];
+              if (res !== 'coins') nextResources[res] = (nextResources[res] || 0) + val;
+            });
+            Object.entries(ri.tradeOut).forEach(function (_ref10) {
+              var _ref11 = _slicedToArray(_ref10, 2), res = _ref11[0], val = _ref11[1];
+              if (res !== 'coins') nextResources[res] = (nextResources[res] || 0) - val;
+            });
+            
+            if (didTrade && nextFacilities.market > 0) nextCoins += 1;
             
             // 🔥 행복도에 따른 수입 계산 로직 추가
             currentHappinessForIncome = calcHappiness(nextHappyBase, nextFacilities);
@@ -1785,7 +1836,8 @@ function StudentCalc(_ref4) {
               happyBase: nextHappyBase,
               resources: nextResources,
               facilities: nextFacilities,
-              lastSubmittedRound: gameState.round
+              lastSubmittedRound: gameState.round,
+              tradeCount: nextTradeCount
             }); 
             saveState(_objectSpread(_objectSpread({}, gameState), {}, {
               groups: _objectSpread(_objectSpread({}, gameState.groups), {}, _defineProperty({}, String(gIdx), updatedGroup))
@@ -1851,6 +1903,42 @@ function StudentCalc(_ref4) {
         /*#__PURE__*/React.createElement("span", { className: "coin-pill" }, "\uD83D\uDCB0 ", group.coins),
         /*#__PURE__*/React.createElement("span", { className: "heart-pill" }, "\uD83D\uDC9A ", happiness)))),
         
+  /* 🚩 특별 미션 팝업 (R7·R8, 이벤트 팝업 없을 때) */
+  needsSpecialMissionPopup && specialMissionInfo && /*#__PURE__*/React.createElement("div", {
+    className: "modal-bg",
+    style: { zIndex: 9998, flexDirection: 'column' }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "modal",
+    style: { animation: 'float-y 2s ease-in-out infinite', border: '4px solid #B57D14', maxWidth: 400 }
+  },
+    /*#__PURE__*/React.createElement("div", { style: { fontSize: 60, marginBottom: 6 } }, "\uD83D\uDEA9"),
+    /*#__PURE__*/React.createElement("h2", { style: { fontFamily: 'Jua', fontSize: 24, color: '#B57D14', margin: '0 0 6px' } }, "\uD83C\uDF1F \uD2B9\uBCC4 \uBBF8\uC158 \uC2DC\uC791!"),
+    /*#__PURE__*/React.createElement("p", { style: { fontFamily: 'Gaegu', fontSize: 16, color: 'var(--ink-soft)', margin: '0 0 14px' } }, "R7~R8, 2\uB77C\uC6B4\uB4DC \uC548\uC5D0 \uC644\uC218\uD558\uC138\uC694!"),
+    /*#__PURE__*/React.createElement("div", { style: { background: 'linear-gradient(180deg,#FFF8E0,#FFE9B0)', border: '3px solid #F2C260', borderRadius: 16, padding: '16px 14px', marginBottom: 12, textAlign: 'left' } },
+      /*#__PURE__*/React.createElement("div", { style: { fontFamily: 'Jua', fontSize: 20, color: '#7A4D0C', marginBottom: 6 } }, specialMissionInfo.icon, " ", specialMissionInfo.title),
+      /*#__PURE__*/React.createElement("p", { style: { fontFamily: 'Gaegu', fontSize: 15, color: '#5A3A22', margin: '0 0 10px', lineHeight: 1.4 } }, specialMissionInfo.desc),
+      /*#__PURE__*/React.createElement("div", { style: { background: 'white', borderRadius: 10, padding: '8px 12px', fontFamily: 'Jua', fontSize: 15, color: 'var(--wood-deep)', marginBottom: 10 } },
+        "\uD604\uC7AC: ", /*#__PURE__*/React.createElement("b", { style: { color: specialMissionInfo.current >= specialMissionInfo.target ? '#4F8A2E' : 'var(--berry-deep)' } }, specialMissionInfo.current, specialMissionInfo.unit),
+        " / \uBAA9\uD45C: ", /*#__PURE__*/React.createElement("b", null, specialMissionInfo.target, specialMissionInfo.unit)
+      ),
+      (function() {
+        var m = SPECIAL_MISSIONS[group.selectedGoal];
+        if (!m || !m.hint) return null;
+        return /*#__PURE__*/React.createElement("div", { style: { display: 'flex', flexDirection: 'column', gap: 6 } },
+          /*#__PURE__*/React.createElement("div", { style: { fontFamily: 'Jua', fontSize: 13, color: '#8E5A2E', marginBottom: 2, letterSpacing: '0.5px' } }, "\uD83D\uDCA1 \uACF5\uB7B5 \uD301"),
+          m.hint.map(function(h, i) {
+            return /*#__PURE__*/React.createElement("div", { key: i, style: { background: 'rgba(255,255,255,0.7)', borderRadius: 8, padding: '6px 10px', fontFamily: 'Gaegu', fontSize: 14, color: '#5A3A22', lineHeight: 1.4 } }, h);
+          })
+        );
+      })()
+    ),
+    /*#__PURE__*/React.createElement("button", {
+      onClick: function() { setSpecialMissionSeen(true); },
+      className: "btn3d green",
+      style: { width: '100%', fontSize: 20 }
+    }, "\uD83D\uDCAA \uD655\uC778! \uBBF8\uC158 \uC2DC\uC791\uD558\uAE30")
+  )),
+
   /* 🔥 메인 퀘스트 상자 (HUD 바로 아래 노출) */
   /*#__PURE__*/React.createElement("div", { style: { maxWidth: 720, margin: '0 auto', padding: '16px 18px 0' } },
     /*#__PURE__*/React.createElement("div", { className: "plate-soft", style: { padding: '12px 16px', background: '#FFFDF0', border: '2px solid #FFD371' } },
@@ -1860,7 +1948,15 @@ function StudentCalc(_ref4) {
       ),
       /*#__PURE__*/React.createElement("div", { style: { fontFamily: 'Jua', fontSize: 20, margin: '4px 0' } }, currentGoal.title),
       /*#__PURE__*/React.createElement("p", { style: { fontFamily: 'Gaegu', fontSize: 15, color: '#8A6B4F', margin: 0 } }, currentGoal.desc),
-      /*#__PURE__*/React.createElement("div", { style: { marginTop: 8, padding: '6px 10px', background: '#FFF', borderRadius: 8, fontSize: 14, border: '1px dashed #FFD371', fontFamily: 'Gaegu', color: '#5A3A22' } }, "\uD83D\uDCA1 ", /*#__PURE__*/React.createElement("b", null, "\uACF5\uB7B5 \uD301:"), " ", currentGoal.tip)
+      /*#__PURE__*/React.createElement("div", { style: { marginTop: 8, padding: '6px 10px', background: '#FFF', borderRadius: 8, fontSize: 14, border: '1px dashed #FFD371', fontFamily: 'Gaegu', color: '#5A3A22' } }, "\uD83D\uDCA1 ", /*#__PURE__*/React.createElement("b", null, "\uACF5\uB7B5 \uD301:"), " ", currentGoal.tip),
+      isSpecialMissionRound && specialMissionInfo && /*#__PURE__*/React.createElement("div", { style: { marginTop: 10, padding: '8px 12px', background: specialMissionInfo.done ? 'linear-gradient(180deg,#E8F8EC,#C8F0D0)' : 'linear-gradient(180deg,#FFF3D6,#FFE6A8)', borderRadius: 10, border: specialMissionInfo.done ? '2px solid #4F8A2E' : '2px solid #F2C260', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' } },
+        /*#__PURE__*/React.createElement("div", null,
+          /*#__PURE__*/React.createElement("span", { style: { fontFamily: 'Jua', fontSize: 13, color: specialMissionInfo.done ? '#2E6B4F' : '#7A4D0C' } }, "\uD83D\uDEA9 \uD2B9\uBCC4\uBBF8\uC158: ", specialMissionInfo.icon, " ", specialMissionInfo.title)
+        ),
+        /*#__PURE__*/React.createElement("span", { style: { fontFamily: 'Jua', fontSize: 14, color: specialMissionInfo.done ? '#4F8A2E' : 'var(--berry-deep)', background: 'white', borderRadius: 999, padding: '2px 10px', border: specialMissionInfo.done ? '1.5px solid #4F8A2E' : '1.5px solid var(--berry-deep)' } },
+          specialMissionInfo.current, specialMissionInfo.unit, " / ", specialMissionInfo.target, specialMissionInfo.unit, " ", specialMissionInfo.done ? '\u2705' : ''
+        )
+      )
     )
   ),
   
@@ -1885,7 +1981,17 @@ function StudentCalc(_ref4) {
         /*#__PURE__*/React.createElement("div", { style: { fontFamily: 'Jua', fontSize: 16, color: 'var(--wood-deep)', marginBottom: 10 } }, "\uD83C\uDFD7\uFE0F \uBCF4\uC720 \uC2DC\uC124"),
         /*#__PURE__*/React.createElement("div", { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 } }, Object.entries(FACILITIES).map(function (_ref18) {
           var _ref19 = _slicedToArray(_ref18, 2), id = _ref19[0], f = _ref19[1];
-          return /*#__PURE__*/React.createElement("div", { key: id, className: "chip", style: { padding: '6px 10px' } }, /*#__PURE__*/React.createElement("span", { className: "ic" }, f.icon), /*#__PURE__*/React.createElement("span", { style: { fontSize: 13 } }, f.name), /*#__PURE__*/React.createElement("span", { className: "num" }, group.facilities[id] || 0));
+          var cnt = group.facilities[id] || 0;
+          var isEmpty = cnt === 0;
+          return /*#__PURE__*/React.createElement("div", { key: id,
+            style: { display: 'flex', flexDirection: 'column', background: isEmpty ? '#F8F5EE' : 'white', border: isEmpty ? '1.5px solid #EEE3C8' : '2px solid #F2D9A8', borderRadius: 14, padding: '8px 10px', opacity: isEmpty ? 0.5 : 1, boxShadow: isEmpty ? 'none' : 'inset 0 -2px 0 rgba(198,138,79,0.10)' } },
+            /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 } },
+              /*#__PURE__*/React.createElement("span", { style: { fontSize: 18 } }, f.icon),
+              /*#__PURE__*/React.createElement("span", { style: { fontFamily: 'Jua', fontSize: 13, color: 'var(--ink)' } }, f.name),
+              /*#__PURE__*/React.createElement("span", { style: { marginLeft: 'auto', fontFamily: 'Jua', fontSize: 17, color: isEmpty ? '#AAA' : 'var(--wood-deep)', minWidth: 18, textAlign: 'right' } }, cnt)
+            ),
+            /*#__PURE__*/React.createElement("div", { style: { fontFamily: 'Gaegu', fontSize: 12, color: isEmpty ? '#BBB' : 'var(--ink-soft)', lineHeight: 1.3 } }, f.desc)
+          );
         })))),
     /*#__PURE__*/React.createElement(SectionTitle, { icon: "\uD83E\uDDF1", text: "\uC2DC\uC124 \uAC74\uC124", sub: "\uB0A8\uC740 \uCF54\uC778: ".concat(coinAfterSettle), accent: "var(--wood-deep)" }),
     /*#__PURE__*/React.createElement("div", { className: "plate-soft", style: { padding: 16, marginBottom: 28 } },
@@ -1897,34 +2003,18 @@ function StudentCalc(_ref4) {
     isTradeRound(gameState.round) && /*#__PURE__*/React.createElement(React.Fragment, null,
       /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, flexWrap: 'wrap', gap: 8 } },
         /*#__PURE__*/React.createElement(SectionTitle, { icon: "\uD83E\uDD1D", text: "\uAD50\uB958 \uD655\uC815", sub: "1\uCC28\uB294 \uAE30\uBCF8, 2\uCC28\uB294 \uC120\uD0DD \uC804\uB7B5", accent: "var(--ocean-deep)", inline: true }),
-        /*#__PURE__*/React.createElement("div", { style: { display:'flex', gap:6, flexWrap:'wrap' } },
+        /*#__PURE__*/React.createElement("div", { style: { display: 'flex', gap: 6, flexWrap: 'wrap' } },
           /*#__PURE__*/React.createElement("span", { className: "tag-num" }, "\uAD50\uB958 ", group.tradeCount || 0, "\uD68C"),
           /*#__PURE__*/React.createElement("span", { className: "tag-num" }, "\u2B50 \uAD50\uB958 \uC810\uC218 ", group.tradeScore || group.tradeCount || 0, "\uC810"))),
-      /*#__PURE__*/React.createElement("details", { className: "plate-soft", style: { padding: 14, marginBottom: 14, background: '#FFFDF0' }, open: gameState.round === 5 },
-        /*#__PURE__*/React.createElement("summary", { style: { cursor:'pointer', fontFamily:'Jua', fontSize:16, color:'var(--wood-deep)' } }, "\u2B50 \uAD50\uB958\uC655 \uC810\uC218\uB294 \uC774\uB807\uAC8C \uC62C\uB77C\uAC00\uC694!"),
-        /*#__PURE__*/React.createElement("div", { style: { marginTop:10, display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(150px, 1fr))', gap:8, fontFamily:'Gaegu', fontSize:15, color:'var(--ink-soft)' } },
-          /*#__PURE__*/React.createElement("div", null, "\uD83E\uDD1D 1\uCC28 \uC9C0\uC815 \uAD50\uB958: +1\uC810"),
-          /*#__PURE__*/React.createElement("div", null, "\uD83C\uDFAF 2\uCC28 \uC790\uC720 \uAD50\uB958: +2\uC810"),
-          /*#__PURE__*/React.createElement("div", null, "\uD83C\uDF10 \uCC98\uC74C \uAD50\uB958\uD558\uB294 \uB9C8\uC744: +1\uC810"),
-          /*#__PURE__*/React.createElement("div", null, "\uD83C\uDFAD \uCC98\uC74C \uD558\uB294 \uAD50\uB958 \uC885\uB958: +1\uC810"),
-          /*#__PURE__*/React.createElement("div", null, "\uD83D\uDED2 \uC2DC\uC7A5\uC774 \uC788\uC73C\uBA74: +1\uC810"),
-          /*#__PURE__*/React.createElement("div", null, "\u26A0\uFE0F 2\uCC28 \uAD50\uB958 \uBE44\uC6A9: 2\uCF54\uC778 / \uC2DC\uC7A5 \uBCF4\uC720 \uC2DC 1\uCF54\uC778")),
-        /*#__PURE__*/React.createElement("p", { style: { margin:'10px 0 0', fontFamily:'Gaegu', fontSize:15, color:'var(--ink)' } }, "\uAD50\uB958\uC655\uC740 \uB2E8\uC21C\uD788 \uB9CE\uC774 \uAD50\uB958\uD55C \uB9C8\uC744\uC774 \uC544\uB2C8\uB77C, \uC5EC\uB7EC \uB9C8\uC744\uACFC \uB2E4\uC591\uD55C \uBC29\uC2DD\uC73C\uB85C \uC798 \uC5F0\uACB0\uD55C \uB9C8\uC744\uC785\uB2C8\uB2E4!")),
       /*#__PURE__*/React.createElement("div", { style: { display: 'grid', gridTemplateColumns: '1fr', gap: 14, marginBottom: 28 } },
-        /*#__PURE__*/React.createElement(TradeSlotPanel, {
-          slotKey: "first", title: "\uD83E\uDD1D 1\uCC28 \uC9C0\uC815 \uAD50\uB958", sub: designatedPartner ? "\uC774\uBC88 \uB77C\uC6B4\uB4DC \uC9C0\uC815 \uC0C1\uB300" : "R8\uC740 1\uCC28\uB3C4 \uC790\uC720 \uC120\uD0DD", draft: firstDraft, confirmed: roundTrades.first, scoreInfo: firstScoreInfo, problem: firstTradeProblem,
-          cost: getTradeCost('first', group), partnerOptions: getPartnerOptions(gIdx), designatedPartner: designatedPartner, saving: saving,
+        /*#__PURE__*/React.createElement(TradeSlotPanel, { slotKey: "first", title: "\uD83E\uDD1D 1\uCC28 \uC9C0\uC815 \uAD50\uB958", sub: designatedPartner ? "\uC774\uBC88 \uB77C\uC6B4\uB4DC \uC9C0\uC815 \uC0C1\uB300" : "R8\uC740 1\uCC28\uB3C4 \uC790\uC720 \uC120\uD0DD", draft: firstDraft, confirmed: roundTrades.first, scoreInfo: firstScoreInfo, problem: firstTradeProblem, cost: getTradeCost('first', group), partnerOptions: getPartnerOptions(gIdx), designatedPartner: designatedPartner, saving: saving,
           onPatch: function onPatch(patch) { return updateTradeDraft('first', patch); },
           onAmount: function onAmount(direction, key, value) { return updateTradeAmount('first', direction, key, value); },
-          onConfirm: function onConfirm() { return handleConfirmTrade('first'); }
-        }),
-        /*#__PURE__*/React.createElement(TradeSlotPanel, {
-          slotKey: "second", title: "\uD83C\uDFAF 2\uCC28 \uC790\uC720 \uAD50\uB958", sub: "\uD544\uC694\uD560 \uB54C\uB9CC \uC120\uD0DD\uD558\uB294 \uC804\uB7B5 \uAD50\uB958", draft: secondDraft, confirmed: roundTrades.second, scoreInfo: secondScoreInfo, problem: secondTradeProblem,
-          cost: getTradeCost('second', group), partnerOptions: getPartnerOptions(gIdx), designatedPartner: '', saving: saving,
+          onConfirm: function onConfirm() { return handleConfirmTrade('first'); } }),
+        /*#__PURE__*/React.createElement(TradeSlotPanel, { slotKey: "second", title: "\uD83C\uDFAF 2\uCC28 \uC790\uC720 \uAD50\uB958", sub: "\uD544\uC694\uD560 \uB54C\uB9CC \uC120\uD0DD\uD558\uB294 \uC804\uB7B5 \uAD50\uB958", draft: secondDraft, confirmed: roundTrades.second, scoreInfo: secondScoreInfo, problem: secondTradeProblem, cost: getTradeCost('second', group), partnerOptions: getPartnerOptions(gIdx), designatedPartner: '', saving: saving,
           onPatch: function onPatch(patch) { return updateTradeDraft('second', patch); },
           onAmount: function onAmount(direction, key, value) { return updateTradeAmount('second', direction, key, value); },
-          onConfirm: function onConfirm() { return handleConfirmTrade('second'); }
-        }))),
+          onConfirm: function onConfirm() { return handleConfirmTrade('second'); } }))),
     !isTradeRound(gameState.round) && /*#__PURE__*/React.createElement("div", { className: "bubble banner-info-blue", style: { marginBottom: 24 } },
       /*#__PURE__*/React.createElement("div", { style: { fontFamily: 'Gaegu', fontSize: 16, color: 'var(--in-ink)' } }, "\uD83E\uDD1D \uAD50\uB958\uB294 R5\uBD80\uD130 \uC2DC\uC791\uD569\uB2C8\uB2E4. \uC9C0\uAE08\uC740 \uAC74\uBB3C \uAC74\uC124\uACFC \uC790\uC6D0 \uC0DD\uC0B0\uC5D0 \uC9D1\uC911\uD574\uC694!")),
     /*#__PURE__*/React.createElement("button", { onClick: function onClick() { return setShowConfirm(true); }, disabled: settleDisabled, className: "settle-btn" }, saving ? '⏳ 저장 중...' : needsEventPopup ? '⚡ 속보를 먼저 확인해주세요!' : settleDisabled ? '😢 코인이 부족해요!' : "\u2705 \uB77C\uC6B4\uB4DC ".concat(gameState.round, " \uC815\uC0B0 \uD655\uC815\uD558\uAE30")),
@@ -1985,12 +2075,12 @@ function TeacherBoard(_ref22) {
       }
       var isDone = g.lastSubmittedRound === round;
       var happy = calcHappiness(g.happyBase, g.facilities);
-      var happyColor = happy >= 70 ? 'var(--neon-green)' : happy >= 40 ? 'var(--neon-orange)' : '#FF6B6B';
-      var happyShadow = happy >= 70 ? 'rgba(108,255,177,0.7)' : happy >= 40 ? 'rgba(255,169,77,0.7)' : 'rgba(255,107,107,0.7)';
+      var happyColor = happy > 100 ? 'var(--neon-yellow)' : happy >= 70 ? 'var(--neon-green)' : happy >= 40 ? 'var(--neon-orange)' : '#FF6B6B';
+      var happyShadow = happy > 100 ? 'rgba(255,228,94,0.9)' : happy >= 70 ? 'rgba(108,255,177,0.7)' : happy >= 40 ? 'rgba(255,169,77,0.7)' : 'rgba(255,107,107,0.7)';
       return /*#__PURE__*/React.createElement("div", { key: n, className: "tv-card-big tv-".concat(n, " ").concat(isDone ? 'done' : ''), style: isFlashing ? { boxShadow: '0 0 40px rgba(108,255,177,0.8)', border: '2px solid rgba(108,255,177,1)', transition: 'all 0.3s' } : {} },
         isFlashing && /*#__PURE__*/React.createElement("div", { style: { position: 'absolute', top: 8, right: 12, background: '#6CFFB1', color: '#0E1B3D', borderRadius: 999, padding: '3px 12px', fontFamily: 'Jua', fontSize: 13, zIndex: 10 } }, "\uD83D\uDD25 \uBC29\uAE08 \uAC31\uC2E0\uB428!"),
         /*#__PURE__*/React.createElement("div", { className: "group-tag" }, n, "\uBAA8\uB460", isDone && /*#__PURE__*/React.createElement("span", { style: { marginLeft: 5, fontSize: '0.85em' } }, " \u2713")),
-        /*#__PURE__*/React.createElement("div", { className: "tv-card-head" }, /*#__PURE__*/React.createElement("h3", null, VILLAGE_THEME[String(n)].roof, " ", g.name), /*#__PURE__*/React.createElement("span", { className: "trade-tag" }, "\uD83E\uDD1D \uAD50\uB958 ", g.tradeCount || 0, "\uD68C · \u2B50", g.tradeScore || g.tradeCount || 0, "\uC810")),
+        /*#__PURE__*/React.createElement("div", { className: "tv-card-head" }, /*#__PURE__*/React.createElement("h3", null, VILLAGE_THEME[String(n)].roof, " ", g.name), /*#__PURE__*/React.createElement("span", { className: "trade-tag" }, "\uD83E\uDD1D \uAD50\uB958 ", g.tradeCount || 0, "\uD68C")),
         g.selectedGoal && VILLAGE_GOALS[g.selectedGoal] && /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,228,94,0.12)', border: '1.5px solid rgba(255,228,94,0.4)', borderRadius: 10, padding: '4px 10px' } },
           /*#__PURE__*/React.createElement("span", { style: { fontFamily: 'Jua', fontSize: 'clamp(10px,1.3vh,13px)', color: 'var(--neon-yellow)' } }, "\uD83C\uDFAF \uBAA9\uD45C:"),
           /*#__PURE__*/React.createElement("span", { style: { fontFamily: 'Jua', fontSize: 'clamp(10px,1.3vh,13px)', color: 'white' } }, VILLAGE_GOALS[g.selectedGoal].title)),
@@ -2002,7 +2092,22 @@ function TeacherBoard(_ref22) {
           var v = g.resources[id] || 0;
           var warn = id === 'rice' && v <= 0;
           return /*#__PURE__*/React.createElement("div", { key: id, className: "tv-resource-big ".concat(warn ? 'warn' : '') }, /*#__PURE__*/React.createElement("div", { className: "ic" }, r.icon), /*#__PURE__*/React.createElement("div", { className: "v" }, v), /*#__PURE__*/React.createElement("div", { className: "nm" }, r.name));
-        })));
+        })),
+        round >= 7 && (function() {
+          var sm = calcSpecialMission(g);
+          if (!sm) return null;
+          var pct = Math.min(100, Math.round(sm.current / sm.target * 100));
+          var barColor = sm.done ? '#6CFFB1' : pct >= 70 ? 'var(--neon-orange)' : '#FF8888';
+          return /*#__PURE__*/React.createElement("div", { style: { background: 'rgba(0,0,0,0.3)', border: sm.done ? '1.5px solid rgba(108,255,177,0.7)' : '1.5px solid rgba(255,228,94,0.5)', borderRadius: 'clamp(6px,1vh,10px)', padding: 'clamp(4px,0.6vh,7px) clamp(6px,0.8vw,10px)' } },
+            /*#__PURE__*/React.createElement("div", { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 } },
+              /*#__PURE__*/React.createElement("span", { style: { fontFamily: 'Jua', fontSize: 'clamp(8px,1.1vh,11px)', color: 'var(--neon-yellow)', letterSpacing: '0.5px' } }, "\uD83D\uDEA9 ", sm.icon, " ", sm.title),
+              /*#__PURE__*/React.createElement("span", { style: { fontFamily: 'Jua', fontSize: 'clamp(9px,1.2vh,12px)', color: sm.done ? '#6CFFB1' : 'white' } }, sm.current, sm.unit, " / ", sm.target, sm.unit, sm.done ? " \u2705" : "")
+            ),
+            /*#__PURE__*/React.createElement("div", { style: { height: 6, background: 'rgba(255,255,255,0.12)', borderRadius: 999, overflow: 'hidden' } },
+              /*#__PURE__*/React.createElement("div", { style: { height: '100%', width: pct + '%', background: barColor, borderRadius: 999, transition: 'width 0.5s ease', boxShadow: '0 0 6px ' + barColor } })
+            )
+          );
+        })());
     })),
     /*#__PURE__*/React.createElement("div", { className: "tv-footer" },
       /*#__PURE__*/React.createElement("div", { className: "tv-footer-q" }, /*#__PURE__*/React.createElement("div", { className: "lbl" }, "\u25B8 \uD575\uC2EC \uC9C8\uBB38"), /*#__PURE__*/React.createElement("p", null, "Q. ", ROUND_QUESTIONS[String(round)])),
@@ -2020,18 +2125,13 @@ function TeacherBoard(_ref22) {
 // ─────────────────────────────────────────────────────────────
 //  공통 컴포넌트
 // ─────────────────────────────────────────────────────────────
-function SectionTitle(_ref25) {
-  var icon = _ref25.icon, text = _ref25.text, sub = _ref25.sub, accent = _ref25.accent, inline = _ref25.inline;
-  return /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: inline ? 0 : 12 } }, /*#__PURE__*/React.createElement("span", { style: { fontFamily: 'Jua', fontSize: 22, color: accent || 'var(--ink)' } }, icon, " ", text), sub && /*#__PURE__*/React.createElement("span", { style: { fontFamily: 'Gaegu', fontSize: 15, color: 'var(--ink-soft)' } }, sub));
-}
-
 function TradeSlotPanel(props) {
   var slotKey = props.slotKey, title = props.title, sub = props.sub, draft = props.draft, confirmed = props.confirmed, scoreInfo = props.scoreInfo, problem = props.problem, cost = props.cost, partnerOptions = props.partnerOptions, designatedPartner = props.designatedPartner, saving = props.saving, onPatch = props.onPatch, onAmount = props.onAmount, onConfirm = props.onConfirm;
   var isConfirmed = confirmed && confirmed.confirmed;
   var disabled = !!problem || saving || isConfirmed;
   var panelStyle = { padding: 16, background: slotKey === 'first' ? '#F8FCFF' : '#FFFDF0', border: slotKey === 'first' ? '3px solid var(--in-border)' : '3px solid #F2C260', marginBottom: 0 };
   var renderBundle = function renderBundle(direction, label, cls, color) {
-    return /*#__PURE__*/React.createElement("div", { className: "trade-panel ".concat(cls), style: { boxShadow: 'none' } },
+    return /*#__PURE__*/React.createElement("div", { className: "trade-panel " + cls, style: { boxShadow: 'none' } },
       /*#__PURE__*/React.createElement("div", { style: { fontFamily: 'Jua', fontSize: 15, color: color, marginBottom: 8 } }, label),
       Object.keys(RESOURCES).map(function(id) {
         return /*#__PURE__*/React.createElement("div", { key: id, className: "trade-row" },
@@ -2045,49 +2145,57 @@ function TradeSlotPanel(props) {
         /*#__PURE__*/React.createElement("input", { className: "trade-input", type: "number", min: "0", value: (draft[direction] && draft[direction].coins) || 0, disabled: isConfirmed, onChange: function onChange(e) { return onAmount(direction, 'coins', e.target.value); } }))
     );
   };
-  var header = /*#__PURE__*/React.createElement("div", { style: { display:'flex', justifyContent:'space-between', alignItems:'center', gap:10, marginBottom:10, flexWrap:'wrap' } },
+  var header = /*#__PURE__*/React.createElement("div", { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, marginBottom: 10, flexWrap: 'wrap' } },
     /*#__PURE__*/React.createElement("div", null,
-      /*#__PURE__*/React.createElement("div", { style: { fontFamily:'Jua', fontSize:19, color:'var(--ink)' } }, title),
-      sub && /*#__PURE__*/React.createElement("div", { style: { fontFamily:'Gaegu', fontSize:14, color:'var(--ink-soft)', marginTop:2 } }, sub)),
-    isConfirmed ? /*#__PURE__*/React.createElement("span", { className: "tag-num", style: { background:'#DFF5F1', color:'#2E6B4F' } }, "\u2705 \uD655\uC815 \uC644\uB8CC · +", confirmed.score || 0, "\uC810") : /*#__PURE__*/React.createElement("span", { className: "tag-num", style: { background:'#FFF1B4' } }, "\uC608\uC0C1 +", scoreInfo.total, "\uC810")
+      /*#__PURE__*/React.createElement("div", { style: { fontFamily: 'Jua', fontSize: 19, color: 'var(--ink)' } }, title),
+      sub && /*#__PURE__*/React.createElement("div", { style: { fontFamily: 'Gaegu', fontSize: 14, color: 'var(--ink-soft)', marginTop: 2 } }, sub)),
+    isConfirmed ? /*#__PURE__*/React.createElement("span", { className: "tag-num", style: { background: '#DFF5F1', color: '#2E6B4F' } }, "\u2705 \uD655\uC815 \uC644\uB8CC · +", confirmed.score || 0, "\uC810") :
+      /*#__PURE__*/React.createElement("span", { className: "tag-num", style: { background: '#FFF1B4' } }, "\uC608\uC0C1 +", scoreInfo.total, "\uC810")
   );
   var body;
   if (isConfirmed) {
-    body = /*#__PURE__*/React.createElement("div", { style: { background:'white', border:'2px dashed #B6E8DC', borderRadius:14, padding:12, fontFamily:'Gaegu', fontSize:16, color:'var(--ink)' } },
+    body = /*#__PURE__*/React.createElement("div", { style: { background: 'white', border: '2px dashed #B6E8DC', borderRadius: 14, padding: 12, fontFamily: 'Gaegu', fontSize: 16, color: 'var(--ink)' } },
       "\uC0C1\uB300: ", confirmed.partner, "\uBAA8\uB460 · \uC885\uB958: ", confirmed.type, " · \uBE44\uC6A9: ", confirmed.cost || 0, "\uCF54\uC778",
       /*#__PURE__*/React.createElement("br", null), "\uAD50\uB958 \uC810\uC218 +", confirmed.score || 0, "\uC810\uC774 TV\uC5D0 \uBC18\uC601\uB410\uC5B4\uC694.");
   } else {
-    var partnerInput = designatedPartner ? /*#__PURE__*/React.createElement("div", { style: { marginTop:6, padding:'9px 12px', background:'white', border:'2px solid var(--wood-light)', borderRadius:12 } }, designatedPartner, "\uBAA8\uB460") : /*#__PURE__*/React.createElement("select", { value: draft.partner || '', onChange: function onChange(e) { return onPatch({ partner: e.target.value }); }, style: { marginTop:6, width:'100%', height:40, borderRadius:12, border:'2px solid var(--wood-light)', fontFamily:'Jua', padding:'0 10px', background:'white', color:'var(--ink)' } },
-      /*#__PURE__*/React.createElement("option", { value: "" }, "\uC120\uD0DD"),
-      partnerOptions.map(function(p){ return /*#__PURE__*/React.createElement("option", { key:p, value:p }, p, "\uBAA8\uB460"); })
-    );
+    var partnerInput = designatedPartner ?
+      /*#__PURE__*/React.createElement("div", { style: { marginTop: 6, padding: '9px 12px', background: 'white', border: '2px solid var(--wood-light)', borderRadius: 12 } }, designatedPartner, "\uBAA8\uB460") :
+      /*#__PURE__*/React.createElement("select", { value: draft.partner || '', onChange: function onChange(e) { return onPatch({ partner: e.target.value }); }, style: { marginTop: 6, width: '100%', height: 40, borderRadius: 12, border: '2px solid var(--wood-light)', fontFamily: 'Jua', padding: '0 10px', background: 'white', color: 'var(--ink)' } },
+        /*#__PURE__*/React.createElement("option", { value: "" }, "\uC120\uD0DD"),
+        partnerOptions.map(function(p) { return /*#__PURE__*/React.createElement("option", { key: p, value: p }, p, "\uBAA8\uB460"); })
+      );
     var typeLabel = getTradeTypeLabel(draft);
-    var typeInput = /*#__PURE__*/React.createElement("div", { style: { marginTop:6, padding:'9px 12px', background:'white', border:'2px solid var(--wood-light)', borderRadius:12, fontFamily:'Jua', color: typeLabel === '입력 전' ? 'var(--ink-soft)' : 'var(--ink)' } }, typeLabel, typeLabel !== '입력 전' ? " 교류" : "");
-    var scoreBox = /*#__PURE__*/React.createElement("div", { style: { background:'white', border:'2px dashed #F2D9A8', borderRadius:14, padding:'10px 12px', fontFamily:'Gaegu', fontSize:15, color:'var(--ink)' } },
+    var typeInput = /*#__PURE__*/React.createElement("div", { style: { marginTop: 6, padding: '9px 12px', background: 'white', border: '2px solid var(--wood-light)', borderRadius: 12, fontFamily: 'Jua', color: typeLabel === '입력 전' ? 'var(--ink-soft)' : 'var(--ink)' } }, typeLabel, typeLabel !== '입력 전' ? " 교류" : "");
+    var scoreBox = /*#__PURE__*/React.createElement("div", { style: { background: 'white', border: '2px dashed #F2D9A8', borderRadius: 14, padding: '10px 12px', fontFamily: 'Gaegu', fontSize: 15, color: 'var(--ink)' } },
       "\uC608\uC0C1 \uC810\uC218: \uAE30\uBCF8 +", scoreInfo.base,
       scoreInfo.newPartner ? " · \uC0C8 \uC0C1\uB300 +1" : "",
       scoreInfo.cultureFirst ? " · \uBB38\uD654 \uCCAB \uAD50\uB958 +1" : "",
       scoreInfo.market ? " · \uC2DC\uC7A5 +1" : "",
-      " = ", /*#__PURE__*/React.createElement("b", { style: { color:'var(--berry-deep)' } }, "+", scoreInfo.total, "\uC810"),
-      cost > 0 && /*#__PURE__*/React.createElement("div", { style: { marginTop:4, color:'#7A4D0C' } }, "\uD83D\uDCB0 2\uCC28 \uAD50\uB958 \uBE44\uC6A9: ", cost, "\uCF54\uC778"),
-      problem && /*#__PURE__*/React.createElement("div", { style: { marginTop:4, color:'var(--berry-deep)' } }, "\u26A0\uFE0F ", problem)
+      " = ", /*#__PURE__*/React.createElement("b", { style: { color: 'var(--berry-deep)' } }, "+", scoreInfo.total, "\uC810"),
+      cost > 0 && /*#__PURE__*/React.createElement("div", { style: { marginTop: 4, color: '#7A4D0C' } }, "\uD83D\uDCB0 2\uCC28 \uAD50\uB958 \uBE44\uC6A9: ", cost, "\uCF54\uC778"),
+      problem && /*#__PURE__*/React.createElement("div", { style: { marginTop: 4, color: 'var(--berry-deep)' } }, "\u26A0\uFE0F ", problem)
     );
     body = /*#__PURE__*/React.createElement(React.Fragment, null,
-      /*#__PURE__*/React.createElement("div", { style: { display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginBottom:12 } },
-        /*#__PURE__*/React.createElement("label", { style: { fontFamily:'Jua', fontSize:14, color:'var(--ink)' } }, "\uC0C1\uB300 \uB9C8\uC744", partnerInput),
-        /*#__PURE__*/React.createElement("label", { style: { fontFamily:'Jua', fontSize:14, color:'var(--ink)' } }, "\uAD50\uB958 \uC885\uB958", typeInput)
+      /*#__PURE__*/React.createElement("div", { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 } },
+        /*#__PURE__*/React.createElement("label", { style: { fontFamily: 'Jua', fontSize: 14, color: 'var(--ink)' } }, "\uC0C1\uB300 \uB9C8\uC744", partnerInput),
+        /*#__PURE__*/React.createElement("label", { style: { fontFamily: 'Jua', fontSize: 14, color: 'var(--ink)' } }, "\uAD50\uB958 \uC885\uB958", typeInput)
       ),
-      /*#__PURE__*/React.createElement("div", { style: { display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, marginBottom:12 } },
+      /*#__PURE__*/React.createElement("div", { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 } },
         renderBundle('tradeIn', "\u2B05\uFE0F \uC6B0\uB9AC\uAC00 \uBC1B\uC744 \uAC83", 'in', 'var(--in-ink)'),
         renderBundle('tradeOut', "\u27A1\uFE0F \uC6B0\uB9AC\uAC00 \uC904 \uAC83", 'out', 'var(--out-ink)')
       ),
-      /*#__PURE__*/React.createElement("div", { style: { display:'grid', gridTemplateColumns:'1fr auto', gap:10, alignItems:'center' } },
+      /*#__PURE__*/React.createElement("div", { style: { display: 'grid', gridTemplateColumns: '1fr auto', gap: 10, alignItems: 'center' } },
         scoreBox,
-        /*#__PURE__*/React.createElement("button", { className: disabled ? "btn3d muted" : "btn3d green", disabled: disabled, onClick: onConfirm, style: { fontSize:17, padding:'12px 16px', whiteSpace:'nowrap' } }, saving ? "\uC800\uC7A5 \uC911..." : "\uAD50\uB958 \uD655\uC815")
+        /*#__PURE__*/React.createElement("button", { className: disabled ? "btn3d muted" : "btn3d green", disabled: disabled, onClick: onConfirm, style: { fontSize: 17, padding: '12px 16px', whiteSpace: 'nowrap' } }, saving ? "\uC800\uC7A5 \uC911..." : "\uAD50\uB958 \uD655\uC815")
       )
     );
   }
   return /*#__PURE__*/React.createElement("div", { className: "plate-soft", style: panelStyle }, header, body);
+}
+
+function SectionTitle(_ref25) {
+  var icon = _ref25.icon, text = _ref25.text, sub = _ref25.sub, accent = _ref25.accent, inline = _ref25.inline;
+  return /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: inline ? 0 : 12 } }, /*#__PURE__*/React.createElement("span", { style: { fontFamily: 'Jua', fontSize: 22, color: accent || 'var(--ink)' } }, icon, " ", text), sub && /*#__PURE__*/React.createElement("span", { style: { fontFamily: 'Gaegu', fontSize: 15, color: 'var(--ink-soft)' } }, sub));
 }
 function UseResourceCard(_ref26) {
   var emoji = _ref26.emoji, label = _ref26.label, effect = _ref26.effect, stock = _ref26.stock, onClick = _ref26.onClick, available = _ref26.available, theme = _ref26.theme;
