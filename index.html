@@ -1195,9 +1195,9 @@ var SPECIAL_MISSIONS = {
   },
   exchange: {
     icon: '🤝',
-    title: 'R7·R8 문화 교류 각 1회!',
-    desc: 'R7과 R8 각각에 문화 교류를 1회 이상 포함해야 해요.',
-    hint: ['🎭 문화 교류 = 문화 자원을 주거나 받는 교류예요. 코인만 주고받으면 문화 교류가 아니에요!', '🎭 관광지가 있으면 매 라운드 문화 자원이 생산돼요. 없다면 이웃에게 요청해보세요.', '💡 1차 지정 교류에서 문화를 포함하면 기본 점수 +1 보너스도 챙길 수 있어요!'],
+    title: 'R7·R8 문화 교류 총 2회!',
+    desc: 'R7·R8 합쳐서 문화 교류를 총 2회 이상 하면 달성! (한 라운드에 2회도 OK)',
+    hint: ['🎭 문화 교류 = 문화 자원을 주거나 받는 교류예요. 코인만 주고받으면 문화 교류가 아니에요!', '🎭 관광지가 있으면 매 라운드 문화 자원이 생산돼요. 없다면 이웃에게 요청해보세요.', '💡 R8에 1차·2차 교류 모두 문화를 포함하면 한 라운드에 2회 달성도 가능해요!'],
     target: 2,
     unit: '회',
     getValue: function(g) {
@@ -1205,10 +1205,9 @@ var SPECIAL_MISSIONS = {
       var count = 0;
       [7,8].forEach(function(r) {
         var rd = rt[String(r)] || {};
-        var hasCulture = Object.values(rd).some(function(slot) {
-          return slot && slot.confirmed && slot.types && slot.types.indexOf('문화') >= 0;
+        Object.values(rd).forEach(function(slot) {
+          if (slot && slot.confirmed && slot.types && slot.types.indexOf('문화') >= 0) count++;
         });
-        if (hasCulture) count++;
       });
       return count;
     }
